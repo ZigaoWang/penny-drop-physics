@@ -22,7 +22,7 @@
         }
         #container {
             display: grid;
-            grid-template-columns: 250px 1fr 280px;
+            grid-template-columns: 250px 1fr 320px;
             grid-template-rows: auto auto 1fr auto;
             grid-template-areas:
                 "controls . graphs"
@@ -61,22 +61,22 @@
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            margin: 20px;
-            overflow-y: auto;
-            width: 240px;
+            margin: 20px 30px 20px 0px;
+            overflow: hidden;
+            width: 270px;
             height: fit-content;
             max-height: calc(100vh - 120px);
         }
         #graphs canvas {
-            width: 220px !important;
-            height: 120px !important;
+            width: 250px !important;
+            height: 130px !important;
             background: transparent;
             border-radius: 0px;
             box-shadow: none;
             border: none;
             border-bottom: 1px solid rgba(0,0,0,0.08);
-            margin-bottom: 8px;
-            padding: 8px 0;
+            margin-bottom: 10px;
+            padding: 6px 0;
         }
         #graphs canvas:last-child {
             border-bottom: none;
@@ -84,14 +84,19 @@
         }
         #footer {
             grid-area: footer;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 20px;
             text-align: center;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             pointer-events: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
         }
         #footer a {
             color: #87CEEB;
@@ -135,18 +140,39 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
-            padding: 32px;
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.94);
+            padding: 40px;
+            border-radius: 20px;
             text-align: center;
             z-index: 20;
             display: none;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
-            animation: popIn 0.6s ease-out;
+            box-shadow: 0 32px 64px rgba(0,0,0,0.3);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: auto;
-            max-width: 360px;
-            backdrop-filter: blur(15px);
+            max-width: 480px;
+            backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #verdict h2 {
+            font-size: 28px;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            margin: 0 0 16px 0;
+            letter-spacing: -0.3px;
+        }
+        #verdict #stats {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 16px 0;
+            font-weight: 400;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        #verdict p:last-child {
+            font-size: 13px;
+            opacity: 0.6;
+            margin-top: 24px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 400;
         }
         @keyframes popIn {
             from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
@@ -264,6 +290,7 @@
         </div>
     </div>
     <div id="verdict">
+        <div style="position: absolute; top: 16px; right: 16px; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 24px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: rgba(255,255,255,0.1); transition: all 0.2s;" onclick="document.getElementById('verdict').style.display='none'; resetDrop();" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.color='rgba(255,255,255,0.9)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.6)';">×</div>
         <h2 id="verdict-text"></h2>
         <p id="stats"></p>
         <p>Thresholds are approximate for education only.</p>
@@ -409,53 +436,84 @@
 
         function generateClouds() {
             clouds = [];
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 8; i++) {
                 clouds.push({
                     x: Math.random() * (canvas.width + 300) - 150,
-                    y: 50 + Math.random() * (canvas.height / 4),
-                    size: 25 + Math.random() * 35,
-                    speed: 0.08 + Math.random() * 0.15,
-                    opacity: 0.4 + Math.random() * 0.3,
-                    puffCount: 3 + Math.floor(Math.random() * 3)
+                    y: 40 + Math.random() * (canvas.height / 3.5),
+                    size: 20 + Math.random() * 45,
+                    speed: 0.05 + Math.random() * 0.12,
+                    opacity: 0.4 + Math.random() * 0.35,
+                    puffCount: 4 + Math.floor(Math.random() * 3),
+                    depth: Math.random() > 0.6 ? 'far' : 'near'
                 });
             }
         }
 
         function drawClouds() {
-            clouds.forEach(cloud => {
+            // Draw far clouds first (background layer)
+            clouds.filter(cloud => cloud.depth === 'far').forEach(cloud => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity * 0.6})`;
+                drawSingleCloud(cloud, 0.8);
+            });
+
+            // Draw near clouds (foreground layer)
+            clouds.filter(cloud => cloud.depth === 'near').forEach(cloud => {
                 ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity})`;
-                drawSingleCloud(cloud);
+                drawSingleCloud(cloud, 1.0);
             });
         }
 
-        function drawSingleCloud(cloud) {
-            // Create stable cloud shape without random elements during drawing
-            const baseSize = cloud.size;
+        function drawSingleCloud(cloud, scale = 1.0) {
+            // Create more realistic, fluffy cloud shape
+            const baseSize = cloud.size * scale;
 
-            // Main cloud body
+            // Add subtle shadow effect for depth
+            if (scale === 1.0) {
+                ctx.save();
+                ctx.globalAlpha = 0.1;
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+
+                // Shadow offset
+                ctx.beginPath();
+                ctx.ellipse(cloud.x + 3, cloud.y + 3, baseSize * 1.4, baseSize * 0.8, 0, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            // Main cloud body with softer edges
+            ctx.save();
+            ctx.shadowColor = 'rgba(255,255,255,0.3)';
+            ctx.shadowBlur = baseSize * 0.2;
+
             ctx.beginPath();
-            ctx.ellipse(cloud.x, cloud.y, baseSize * 1.3, baseSize * 0.7, 0, 0, 2 * Math.PI);
+            ctx.ellipse(cloud.x, cloud.y, baseSize * 1.4, baseSize * 0.8, 0, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Fixed positioned puffs for stable appearance
+            // Create more organic puff shapes
             const puffPositions = [
-                { x: -0.6, y: 0.1, size: 0.8 },
-                { x: 0.6, y: -0.1, size: 0.7 },
-                { x: -0.3, y: -0.4, size: 0.6 },
-                { x: 0.4, y: -0.3, size: 0.5 }
+                { x: -0.7, y: 0.1, size: 0.9, skew: 0.8 },
+                { x: 0.7, y: -0.1, size: 0.8, skew: 0.9 },
+                { x: -0.2, y: -0.5, size: 0.7, skew: 0.7 },
+                { x: 0.3, y: -0.4, size: 0.6, skew: 0.8 },
+                { x: -0.5, y: -0.2, size: 0.5, skew: 0.6 },
+                { x: 0.5, y: 0.2, size: 0.6, skew: 0.7 }
             ];
 
-            puffPositions.slice(0, cloud.puffCount).forEach(puff => {
+            puffPositions.slice(0, cloud.puffCount).forEach((puff, i) => {
                 ctx.beginPath();
                 ctx.ellipse(
                     cloud.x + baseSize * puff.x,
                     cloud.y + baseSize * puff.y,
-                    baseSize * puff.size * 0.8,
-                    baseSize * puff.size * 0.6,
-                    0, 0, 2 * Math.PI
+                    baseSize * puff.size * 0.85,
+                    baseSize * puff.size * puff.skew * 0.6,
+                    Math.sin(i) * 0.3,
+                    0, 2 * Math.PI
                 );
                 ctx.fill();
             });
+
+            ctx.restore();
         }
 
         function drawTower() {
@@ -489,15 +547,21 @@
         }
 
         function drawGround() {
-            const gradient = ctx.createLinearGradient(0, canvas.height - 70, 0, canvas.height);
+            const gradient = ctx.createLinearGradient(0, canvas.height - 100, 0, canvas.height - 30);
             gradient.addColorStop(0, '#228B22');
             gradient.addColorStop(1, '#006400');
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 70);
         }
 
         function drawScene() {
-            // Clear and draw sky gradient background
+            // Clear canvas completely and reset all context states
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+
+            // Draw sky gradient background
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, '#4A90E2');
             gradient.addColorStop(0.3, '#87CEEB');
@@ -511,12 +575,12 @@
             drawGround();
 
             // People - just one person in the center
-            drawPerson(canvas.width / 2, canvas.height - 100, !running && t >= t_impact);
+            drawPerson(canvas.width / 2, canvas.height - 130, !running && t >= t_impact);
 
             // Object
             if (running || (!running && t >= t_impact && t_impact > 0)) {
                 const objX = canvas.width / 2;
-                const objY = 30 + (s / h) * (canvas.height - 150);
+                const objY = 30 + (s / h) * (canvas.height - 180);
                 ctx.fillStyle = objColor || 'black';
                 if (objShape === 'feather') {
                     ctx.save();
@@ -537,7 +601,7 @@
                     ctx.restore();
                 } else {
                     ctx.beginPath();
-                    ctx.arc(objX, Math.min(objY, canvas.height - 100), 10, 0, 2 * Math.PI);
+                    ctx.arc(objX, Math.min(objY, canvas.height - 130), 10, 0, 2 * Math.PI);
                     ctx.fill();
                     ctx.shadowColor = 'rgba(0,0,0,0.3)';
                     ctx.shadowBlur = 5;
@@ -632,7 +696,7 @@
 
             // Head
             ctx.save();
-            ctx.translate(x + 12, y);
+            ctx.translate(x + 12, y + 14);
             ctx.rotate(headAngle * Math.PI / 180);
             ctx.beginPath();
             ctx.arc(0, 0, 14, 0, 2 * Math.PI);
@@ -726,10 +790,10 @@
             t = 0;
             s = 0;
             v = 0;
-            a = 0;
-            vtData = [];
-            stData = [];
-            atData = [];
+            a = g; // Initial acceleration is g
+            vtData = [{ x: 0, y: 0 }]; // Start with initial point at t=0
+            stData = [{ x: 0, y: 0 }];
+            atData = [{ x: 0, y: g }];
             particles = [];
             personAnimFrame = 0;
             document.getElementById('start').disabled = true;
@@ -747,6 +811,7 @@
             document.getElementById('reset').disabled = true;
             document.getElementById('object').disabled = false;
             document.getElementById('height').disabled = false;
+            document.getElementById('verdict').style.display = 'none';
             t = 0;
             vtData = [];
             stData = [];
@@ -808,7 +873,7 @@
                         for (let i = 0; i < 40; i++) {
                             particles.push({
                                 x: canvas.width / 2,
-                                y: canvas.height - 100,
+                                y: canvas.height - 130,
                                 vx: (Math.random() - 0.5) * 20,
                                 vy: (Math.random() - 0.5) * 20 - 12,
                                 life: 40 + Math.random() * 30
@@ -817,7 +882,34 @@
                     }
                     document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
                     document.getElementById('verdict-text').style.color = outcome.color;
-                    document.getElementById('stats').innerHTML = `Impact speed: ${v_impact.toFixed(1)} m/s<br>KE: ${ke.toFixed(1)} J → ${outcome.text.toLowerCase()} likely<br>Time: ${t.toFixed(2)} s<br>Terminal velocity reached: ${reached_terminal ? 'Yes' : 'No'}`;
+
+                    // Create Apple-style clean formula display
+                    const formula = `
+                        <div style="text-align: center; padding: 24px 0;">
+                            <div style="font-size: 28px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; margin-bottom: 24px; font-weight: 300; letter-spacing: 1px;">
+                                <span style="color: #007AFF;">KE</span>
+                                <span style="color: #FFF; margin: 0 8px;">=</span>
+                                <span style="color: #34C759;">½</span><span style="color: #FF9500;">m</span><span style="color: #FF3B30;">v</span><span style="color: #FFF;">²</span>
+                            </div>
+
+                            <div style="font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin-bottom: 20px; color: rgba(255,255,255,0.7); font-weight: 400;">
+                                <span style="color: #FF9500;">m</span> = ${mass.toFixed(3)} kg &nbsp;&nbsp; <span style="color: #FF3B30;">v</span> = ${v_impact.toFixed(1)} m/s
+                            </div>
+
+                            <div style="font-size: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin-bottom: 16px; color: #FFF; font-weight: 400;">
+                                = <span style="color: #34C759;">0.5</span> × <span style="color: #FF9500;">${mass.toFixed(3)} kg</span> × <span style="color: #FF3B30;">(${v_impact.toFixed(1)} m/s)</span><span style="color: #FFF;">²</span>
+                            </div>
+
+                            <div style="font-size: 24px; color: #007AFF; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 500;">
+                                = ${ke.toFixed(1)} J
+                            </div>
+
+                            <div style="font-size: 14px; margin-top: 20px; color: rgba(255,255,255,0.6); font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                                Reference: Human skull fracture ≈ 68 J
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('stats').innerHTML = formula;
                     document.getElementById('verdict').style.display = 'block';
                 }
             }
