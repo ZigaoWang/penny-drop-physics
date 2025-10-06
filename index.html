@@ -9,7 +9,7 @@
         body {
             margin: 0;
             overflow: hidden;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             color: #fff;
             background: linear-gradient(to bottom, #4A90E2, #87CEEB, #B6E5F5, #E0F6FF);
         }
@@ -37,16 +37,16 @@
         }
         #controls {
             grid-area: controls;
-            background: rgba(0, 0, 0, 0.75);
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            background: rgba(135, 206, 235, 0.15);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
             margin: 20px;
             pointer-events: auto;
             width: 218px;
             height: fit-content;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(135, 206, 235, 0.3);
         }
         #graphs {
             grid-area: graphs;
@@ -54,17 +54,18 @@
             flex-direction: column;
             justify-content: flex-start;
             gap: 0px;
-            padding: 15px;
+            padding: 20px;
             pointer-events: auto;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(135, 206, 235, 0.15);
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+            border: 1px solid rgba(135, 206, 235, 0.3);
             margin: 20px 10px 20px 0px;
             overflow: hidden;
             width: 290px;
             height: fit-content;
             max-height: calc(100vh - 120px);
+            backdrop-filter: blur(20px);
         }
         #graphs canvas {
             width: 250px !important;
@@ -83,25 +84,30 @@
         }
         #footer {
             grid-area: footer;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 8px 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 12px 20px;
             text-align: center;
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(135, 206, 235, 0.2);
             pointer-events: auto;
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             z-index: 10;
+            font-weight: 400;
+            letter-spacing: 0.1px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         #footer a {
             color: #87CEEB;
             text-decoration: none;
+            transition: color 0.2s ease;
         }
         #footer a:hover {
+            color: #B0E0E6;
             text-decoration: underline;
         }
         #verdict {
@@ -109,25 +115,27 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.94);
-            padding: 30px;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 32px;
+            border-radius: 24px;
             text-align: center;
             z-index: 20;
             display: none;
-            box-shadow: 0 32px 64px rgba(0,0,0,0.3);
+            box-shadow: 0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(135, 206, 235, 0.3);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: auto;
-            max-width: 550px;
+            max-width: 580px;
             max-height: 90vh;
             overflow-y: auto;
             backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(135, 206, 235, 0.4);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
         }
         #verdict h2 {
             font-size: 28px;
             font-weight: 600;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0 0 16px 0;
             letter-spacing: -0.3px;
         }
@@ -136,13 +144,13 @@
             line-height: 1.5;
             margin: 16px 0;
             font-weight: 400;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         #verdict p:last-child {
             font-size: 13px;
             opacity: 0.6;
             margin-top: 24px;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-weight: 400;
         }
         @keyframes popIn {
@@ -153,34 +161,66 @@
             margin-top: 15px;
         }
         input, select, button {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-family: inherit;
+            margin: 12px 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(135, 206, 235, 0.3);
+            background: rgba(135, 206, 235, 0.1);
+            color: #333;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
             width: 100%;
             box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: rgba(135, 206, 235, 0.6);
+            background: rgba(135, 206, 235, 0.15);
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.1);
         }
         button {
-            background: rgba(255, 255, 255, 0.2);
             cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
-        button:hover {
-            background: rgba(255, 255, 255, 0.3);
+        #start {
+            background: linear-gradient(135deg, #4CAF50, #45A049);
+        }
+        #start:hover {
+            background: linear-gradient(135deg, #5CBF60, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        #reset {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+        }
+        #reset:hover {
+            background: linear-gradient(135deg, #FF5722, #F44336);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
         }
         button:active {
-            transform: scale(0.98);
+            transform: translateY(0);
         }
         button:disabled {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(135, 206, 235, 0.3) !important;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: rgba(255, 255, 255, 0.6);
         }
         label {
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.3px;
         }
         @media (max-width: 1200px) {
             #container {
@@ -237,16 +277,16 @@
             </div>
             <label for="height">Drop height</label><br>
             <input id="height" type="range" min="0" max="400" value="100">
-            <span id="height-value">100 m</span><br>
+            <span id="height-value" style="color: #333;">100 m</span><br>
             <button id="start">Start</button>
             <button id="reset" disabled>Reset</button>
         </div>
         <div id="graphs">
-            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 14px;">Velocity vs Time</div>
+            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 8px; font-size: 15px; letter-spacing: 0.5px;">Velocity vs Time</div>
             <canvas id="vt-chart"></canvas>
-            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 14px;">Distance vs Time</div>
+            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 8px; font-size: 15px; letter-spacing: 0.5px;">Distance vs Time</div>
             <canvas id="st-chart"></canvas>
-            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 14px;">Acceleration vs Time</div>
+            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 8px; font-size: 15px; letter-spacing: 0.5px;">Acceleration vs Time</div>
             <canvas id="at-chart"></canvas>
         </div>
         <div id="footer">
@@ -553,7 +593,7 @@
             ctx.restore();
 
             // Object
-            if (running || (!running && t >= t_impact && t_impact > 0)) {
+            if (running || (!running && t > 0)) {
                 const objX = canvas.width / 2;
                 const objY = 30 + (s / h) * (canvas.height - 180);
                 ctx.fillStyle = objColor || 'black';
@@ -731,6 +771,22 @@
         }
 
         function startDrop() {
+            if (running) {
+                // Pause the current simulation
+                running = false;
+                document.getElementById('start').textContent = 'Start';
+                return;
+            }
+
+            // If we have existing data, continue from where we left off
+            if (t > 0 && s < h) {
+                running = true;
+                document.getElementById('start').textContent = 'Stop';
+                lastTime = performance.now();
+                return;
+            }
+
+            // Start new simulation
             const objType = document.getElementById('object').value;
             let selectedObj;
             if (objType === 'custom') {
@@ -776,7 +832,8 @@
             atData = [{ x: 0, y: g }];
             particles = [];
             personAnimFrame = 0;
-            document.getElementById('start').disabled = true;
+            document.getElementById('start').textContent = 'Stop';
+            document.getElementById('start').disabled = false;
             document.getElementById('reset').disabled = false;
             document.getElementById('object').disabled = true;
             document.getElementById('height').disabled = true;
@@ -787,6 +844,7 @@
 
         function resetDrop() {
             running = false;
+            document.getElementById('start').textContent = 'Start';
             document.getElementById('start').disabled = false;
             document.getElementById('reset').disabled = true;
             document.getElementById('object').disabled = false;
@@ -848,6 +906,7 @@
 
                 if (s >= h) {
                     running = false;
+                    document.getElementById('start').textContent = 'Start';
                     // Only show particles for harmless or minor impacts (ke < 50J)
                     if (ke < 50) {
                         for (let i = 0; i < 40; i++) {
@@ -860,91 +919,95 @@
                             });
                         }
                     }
-                    document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
-                    document.getElementById('verdict-text').style.color = outcome.color;
 
-                    // Create professional, clear calculation display
-                    const professionalCalculation = `
-                        <div style="text-align: center; padding: 20px 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    // Delay verdict screen to show animation
+                    setTimeout(() => {
+                        document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
+                        document.getElementById('verdict-text').style.color = outcome.color;
 
-                            <div style="background: rgba(255,255,255,0.06); padding: 20px; border-radius: 12px; margin: 16px 0; text-align: left;">
-                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #87CEEB; text-align: center;">Drop Parameters</div>
+                        // Create professional, clear calculation display
+                        const professionalCalculation = `
+                            <div style="text-align: center; padding: 20px 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px; color: rgba(255,255,255,0.9);">
-                                    <div>
-                                        <div style="color: #87CEEB; font-weight: 600; margin-bottom: 8px;">Object Properties</div>
-                                        <div style="margin-bottom: 4px;">Height: <span style="color: #FFF;">${h} m</span></div>
-                                        <div style="margin-bottom: 4px;">Mass: <span style="color: #FFF;">${mass.toFixed(3)} kg</span></div>
-                                        <div>Terminal velocity: <span style="color: #FF9500;">${terminalV} m/s</span></div>
+                                <div style="background: rgba(135, 206, 235, 0.25); padding: 24px; border-radius: 16px; margin: 20px 0; text-align: left; border: 1px solid rgba(135, 206, 235, 0.4); backdrop-filter: blur(20px);">
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #1565C0; text-align: center; letter-spacing: 0.5px;">Drop Parameters</div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 15px; color: rgba(0,0,0,0.8);">
+                                        <div>
+                                            <div style="color: #1565C0; font-weight: 600; margin-bottom: 12px; font-size: 16px;">Object Properties</div>
+                                            <div style="margin-bottom: 8px;">Height: <span style="color: #000; font-weight: 600;">${h} m</span></div>
+                                            <div style="margin-bottom: 8px;">Mass: <span style="color: #000; font-weight: 600;">${mass.toFixed(3)} kg</span></div>
+                                            <div>Terminal velocity: <span style="color: #FF6F00; font-weight: 600;">${terminalV} m/s</span></div>
+                                        </div>
+                                        <div>
+                                            <div style="color: #2E7D32; font-weight: 600; margin-bottom: 12px; font-size: 16px;">Fall Analysis</div>
+                                            <div style="margin-bottom: 8px;">Total time: <span style="color: #000; font-weight: 600;">${t_impact.toFixed(2)} s</span></div>
+                                            <div style="margin-bottom: 8px;">Terminal reached: <span style="color: ${reached_terminal ? '#2E7D32' : '#D32F2F'}; font-weight: 600;">${reached_terminal ? 'Yes' : 'No'}</span></div>
+                                            <div>Impact speed: <span style="color: #D32F2F; font-weight: 600;">${v_impact.toFixed(1)} m/s</span></div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div style="color: #34C759; font-weight: 600; margin-bottom: 8px;">Fall Analysis</div>
-                                        <div style="margin-bottom: 4px;">Total time: <span style="color: #FFF;">${t_impact.toFixed(2)} s</span></div>
-                                        <div style="margin-bottom: 4px;">Terminal reached: <span style="color: ${reached_terminal ? '#34C759' : '#FF3B30'};">${reached_terminal ? 'Yes' : 'No'}</span></div>
-                                        <div>Impact speed: <span style="color: #FF3B30; font-weight: 600;">${v_impact.toFixed(1)} m/s</span></div>
+                                </div>
+
+                                <div style="background: rgba(135, 206, 235, 0.2); padding: 20px; border-radius: 16px; margin: 20px 0; border: 1px solid rgba(135, 206, 235, 0.4); backdrop-filter: blur(20px);">
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1565C0; text-align: center; letter-spacing: 0.5px;">Impact Velocity Calculation</div>
+
+                                    ${reached_terminal ?
+                                        `<div style="font-size: 22px; margin: 16px 0; letter-spacing: 0.5px; text-align: center;">
+                                            <span style="color: #1565C0;">v</span><sub style="color: #000;">impact</sub> =
+                                            <span style="color: #FF6F00;">terminal velocity</span>
+                                        </div>
+
+                                        <div style="font-size: 18px; margin: 16px 0; color: rgba(0,0,0,0.8); text-align: center;">
+                                            = <span style="color: #FF6F00; font-weight: 600;">${terminalV} m/s</span>
+                                        </div>
+
+                                        <div style="font-size: 26px; color: #1976D2; font-weight: 700; margin: 20px 0; text-align: center;">
+                                            = ${v_impact.toFixed(1)} m/s
+                                        </div>`
+                                        :
+                                        `<div style="font-size: 22px; margin: 16px 0; letter-spacing: 0.5px; text-align: center;">
+                                            <span style="color: #1565C0;">v</span> = √(<span style="color: #2E7D32;">2</span><span style="color: #FF6F00;">g</span><span style="color: #D32F2F;">h</span>)
+                                        </div>
+
+                                        <div style="font-size: 18px; margin: 16px 0; color: rgba(0,0,0,0.8); text-align: center;">
+                                            = √(<span style="color: #2E7D32; font-weight: 600;">2</span> × <span style="color: #FF6F00; font-weight: 600;">9.8 m/s²</span> × <span style="color: #D32F2F; font-weight: 600;">${h} m</span>)
+                                        </div>
+
+                                        <div style="font-size: 26px; color: #1976D2; font-weight: 700; margin: 20px 0; text-align: center;">
+                                            = ${v_impact.toFixed(1)} m/s
+                                        </div>`
+                                    }
+
+                                    <div style="font-size: 14px; color: rgba(0,0,0,0.7); margin-top: 16px; border-top: 1px solid rgba(135, 206, 235, 0.4); padding-top: 16px; text-align: center; font-style: italic;">
+                                        ${reached_terminal ? 'Air resistance limits velocity to terminal value' : 'Terminal velocity depends on object shape and air resistance'}
+                                    </div>
+                                </div>
+
+                                <div style="background: rgba(135, 206, 235, 0.2); padding: 20px; border-radius: 16px; margin: 20px 0; border: 1px solid rgba(135, 206, 235, 0.4); backdrop-filter: blur(20px);">
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1565C0; text-align: center; letter-spacing: 0.5px;">Kinetic Energy Calculation</div>
+
+                                    <div style="font-size: 22px; margin: 16px 0; letter-spacing: 0.5px; text-align: center;">
+                                        <span style="color: #1976D2;">KE</span> =
+                                        <span style="color: #2E7D32;">½</span><span style="color: #FF6F00;">m</span><span style="color: #D32F2F;">v</span><span style="color: #000;">²</span>
+                                    </div>
+
+                                    <div style="font-size: 18px; margin: 16px 0; color: rgba(0,0,0,0.8); text-align: center;">
+                                        = <span style="color: #2E7D32; font-weight: 600;">0.5</span> × <span style="color: #FF6F00; font-weight: 600;">${mass.toFixed(3)} kg</span> × <span style="color: #D32F2F; font-weight: 600;">(${v_impact.toFixed(1)} m/s)²</span>
+                                    </div>
+
+                                    <div style="font-size: 26px; color: #1976D2; font-weight: 700; margin: 20px 0; text-align: center;">
+                                        = ${ke.toFixed(1)} J
+                                    </div>
+
+                                    <div style="font-size: 14px; color: rgba(0,0,0,0.7); margin-top: 16px; border-top: 1px solid rgba(135, 206, 235, 0.4); padding-top: 16px; text-align: center; font-style: italic;">
+                                        Reference: Human skull fracture threshold ≈ 68 J
                                     </div>
                                 </div>
                             </div>
-
-                            <div style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 12px; margin: 16px 0;">
-                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #87CEEB;">Impact Velocity Calculation</div>
-
-                                ${reached_terminal ?
-                                    `<div style="font-size: 20px; margin: 12px 0; letter-spacing: 0.5px;">
-                                        <span style="color: #87CEEB;">v</span><span style="color: #FFF;">_impact</span> =
-                                        <span style="color: #FF9500;">terminal velocity</span>
-                                    </div>
-
-                                    <div style="font-size: 16px; margin: 12px 0; color: rgba(255,255,255,0.8);">
-                                        = <span style="color: #FF9500;">${terminalV} m/s</span>
-                                    </div>
-
-                                    <div style="font-size: 24px; color: #007AFF; font-weight: 600; margin: 16px 0;">
-                                        = ${v_impact.toFixed(1)} m/s
-                                    </div>`
-                                    :
-                                    `<div style="font-size: 20px; margin: 12px 0; letter-spacing: 0.5px;">
-                                        <span style="color: #87CEEB;">v</span> = √(<span style="color: #34C759;">2</span><span style="color: #FF9500;">g</span><span style="color: #FF3B30;">h</span>)
-                                    </div>
-
-                                    <div style="font-size: 16px; margin: 12px 0; color: rgba(255,255,255,0.8);">
-                                        = √(<span style="color: #34C759;">2</span> × <span style="color: #FF9500;">9.8 m/s²</span> × <span style="color: #FF3B30;">${h} m</span>)
-                                    </div>
-
-                                    <div style="font-size: 24px; color: #007AFF; font-weight: 600; margin: 16px 0;">
-                                        = ${v_impact.toFixed(1)} m/s
-                                    </div>`
-                                }
-
-                                <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-                                    ${reached_terminal ? 'Air resistance limits velocity to terminal value' : 'Terminal velocity depends on object shape and air resistance'}
-                                </div>
-                            </div>
-
-                            <div style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 12px; margin: 16px 0;">
-                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #87CEEB;">Kinetic Energy Calculation</div>
-
-                                <div style="font-size: 20px; margin: 12px 0; letter-spacing: 0.5px;">
-                                    <span style="color: #007AFF;">KE</span> =
-                                    <span style="color: #34C759;">½</span><span style="color: #FF9500;">m</span><span style="color: #FF3B30;">v</span><span style="color: #FFF;">²</span>
-                                </div>
-
-                                <div style="font-size: 16px; margin: 12px 0; color: rgba(255,255,255,0.8);">
-                                    = <span style="color: #34C759;">0.5</span> × <span style="color: #FF9500;">${mass.toFixed(3)} kg</span> × <span style="color: #FF3B30;">(${v_impact.toFixed(1)} m/s)²</span>
-                                </div>
-
-                                <div style="font-size: 24px; color: #007AFF; font-weight: 600; margin: 16px 0;">
-                                    = ${ke.toFixed(1)} J
-                                </div>
-
-                                <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-                                    Reference: Human skull fracture threshold ≈ 68 J
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById('stats').innerHTML = professionalCalculation;
-                    document.getElementById('verdict').style.display = 'block';
+                        `;
+                        document.getElementById('stats').innerHTML = professionalCalculation;
+                        document.getElementById('verdict').style.display = 'block';
+                    }, 500); // 0.5 second delay to show animation
                 }
             }
 
