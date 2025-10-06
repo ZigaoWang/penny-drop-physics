@@ -22,11 +22,10 @@
         }
         #container {
             display: grid;
-            grid-template-columns: 250px 1fr 320px;
-            grid-template-rows: auto auto 1fr auto;
+            grid-template-columns: 250px 1fr 340px;
+            grid-template-rows: auto 1fr auto;
             grid-template-areas:
                 "controls . graphs"
-                "info . graphs"
                 ". scene graphs"
                 "footer footer footer";
             position: absolute;
@@ -61,22 +60,22 @@
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            margin: 20px 30px 20px 0px;
+            margin: 20px 10px 20px 0px;
             overflow: hidden;
-            width: 270px;
+            width: 290px;
             height: fit-content;
             max-height: calc(100vh - 120px);
         }
         #graphs canvas {
             width: 250px !important;
-            height: 130px !important;
+            height: 150px !important;
             background: transparent;
             border-radius: 0px;
             box-shadow: none;
             border: none;
             border-bottom: 1px solid rgba(0,0,0,0.08);
-            margin-bottom: 10px;
-            padding: 6px 0;
+            margin-bottom: 15px;
+            padding: 10px 0;
         }
         #graphs canvas:last-child {
             border-bottom: none;
@@ -105,43 +104,13 @@
         #footer a:hover {
             text-decoration: underline;
         }
-        #info {
-            grid-area: info;
-            background: rgba(0, 0, 0, 0.75);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            max-width: 218px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            margin: 20px;
-            pointer-events: auto;
-            height: fit-content;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        #info h3 {
-            margin: 0 0 8px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        #info p {
-            margin: 3px 0;
-            font-size: 10px;
-            line-height: 1.3;
-        }
-        #info code {
-            background: rgba(255,255,255,0.2);
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
         #verdict {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.94);
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
             text-align: center;
             z-index: 20;
@@ -149,7 +118,9 @@
             box-shadow: 0 32px 64px rgba(0,0,0,0.3);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: auto;
-            max-width: 480px;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
             backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -271,29 +242,21 @@
             <button id="reset" disabled>Reset</button>
         </div>
         <div id="graphs">
+            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 14px;">Velocity vs Time</div>
             <canvas id="vt-chart"></canvas>
+            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 14px;">Distance vs Time</div>
             <canvas id="st-chart"></canvas>
+            <div style="text-align: center; font-weight: 600; color: #333; margin-bottom: 5px; font-size: 14px;">Acceleration vs Time</div>
             <canvas id="at-chart"></canvas>
         </div>
-        <div id="info">
-            <h3>Physics Formulas</h3>
-            <p><code>g = 9.8 m/s²</code></p>
-            <p><code>v(t) = g · t</code> (until terminalV, then <code>v = terminalV</code>)</p>
-            <p><code>s(t) = ½ · g · t²</code> (until terminalV, then <code>s += terminalV · Δt</code>)</p>
-            <p><code>a(t) = g</code> (until terminalV, then <code>0</code>)</p>
-            <p><code>v_impact = min(√(2 · g · h), terminalV)</code></p>
-            <p><code>KE = ½ · m · v_impact²</code></p>
-            <p>Note: Simplified model for education.</p>
-        </div>
         <div id="footer">
-            Made by <a href="https://zigao.wang" target="_blank">Zigao Wang</a> • Copyright © 2025 • MIT License • Educational purposes only
+            Made by <a href="https://zigao.wang" target="_blank">Zigao Wang</a> • MIT License • For educational use only • Do not drop objects from heights
         </div>
     </div>
     <div id="verdict">
         <div style="position: absolute; top: 16px; right: 16px; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 24px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: rgba(255,255,255,0.1); transition: all 0.2s;" onclick="document.getElementById('verdict').style.display='none'; resetDrop();" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.color='rgba(255,255,255,0.9)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='rgba(255,255,255,0.6)';">×</div>
         <h2 id="verdict-text"></h2>
         <p id="stats"></p>
-        <p>Thresholds are approximate for education only.</p>
     </div>
     <script>
         const canvas = document.getElementById('scene');
@@ -555,11 +518,21 @@
         }
 
         function drawScene() {
-            // Clear canvas completely and reset all context states
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Complete canvas reset with all state cleanup
+            ctx.save();
             ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.globalAlpha = 1;
+            ctx.globalCompositeOperation = 'source-over';
             ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.shadowColor = 'transparent';
+            ctx.filter = 'none';
+            ctx.lineWidth = 1;
+            ctx.lineCap = 'butt';
+            ctx.lineJoin = 'miter';
+            ctx.miterLimit = 10;
 
             // Draw sky gradient background
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -576,6 +549,8 @@
 
             // People - just one person in the center
             drawPerson(canvas.width / 2, canvas.height - 130, !running && t >= t_impact);
+
+            ctx.restore();
 
             // Object
             if (running || (!running && t >= t_impact && t_impact > 0)) {
@@ -600,23 +575,28 @@
                     }
                     ctx.restore();
                 } else {
-                    ctx.beginPath();
-                    ctx.arc(objX, Math.min(objY, canvas.height - 130), 10, 0, 2 * Math.PI);
-                    ctx.fill();
+                    ctx.save();
                     ctx.shadowColor = 'rgba(0,0,0,0.3)';
                     ctx.shadowBlur = 5;
                     ctx.shadowOffsetY = 2;
+                    ctx.beginPath();
+                    ctx.arc(objX, Math.min(objY, canvas.height - 122), 10, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.restore();
                 }
 
                 // Speed label
                 if (running) {
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                    ctx.shadowBlur = 2;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 1;
                     ctx.font = '16px system-ui';
-                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-                    ctx.lineWidth = 1;
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
                     const speedText = `${v.toFixed(1)} m/s`;
                     ctx.fillText(speedText, objX + 20, objY + 5);
-                    ctx.strokeText(speedText, objX + 20, objY + 5);
+                    ctx.restore();
                 }
             }
 
@@ -873,7 +853,7 @@
                         for (let i = 0; i < 40; i++) {
                             particles.push({
                                 x: canvas.width / 2,
-                                y: canvas.height - 130,
+                                y: canvas.height - 122,
                                 vx: (Math.random() - 0.5) * 20,
                                 vy: (Math.random() - 0.5) * 20 - 12,
                                 life: 40 + Math.random() * 30
@@ -883,47 +863,87 @@
                     document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
                     document.getElementById('verdict-text').style.color = outcome.color;
 
-                    // Create Apple-style physics explanation
-                    const physicsExplanation = reached_terminal ?
-                        `<div style="font-size: 15px; margin-bottom: 16px; color: rgba(255,255,255,0.8); font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.4;">
-                            <div style="margin-bottom: 8px;"><span style="color: #34C759;">Phase 1:</span> Accelerated at <span style="color: #34C759;">9.8 m/s²</span> for <span style="color: #34C759;">${t_term.toFixed(2)} s</span></div>
-                            <div style="margin-bottom: 8px;"><span style="color: #FF9500;">Phase 2:</span> Reached terminal velocity <span style="color: #FF9500;">${terminalV} m/s</span></div>
-                            <div><span style="color: #FF3B30;">Impact speed:</span> Limited to <span style="color: #FF3B30;">${v_impact.toFixed(1)} m/s</span> (terminal velocity)</div>
-                        </div>` :
-                        `<div style="font-size: 15px; margin-bottom: 16px; color: rgba(255,255,255,0.8); font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.4;">
-                            <div style="margin-bottom: 8px;"><span style="color: #34C759;">Acceleration:</span> Constant <span style="color: #34C759;">9.8 m/s²</span> throughout fall</div>
-                            <div style="margin-bottom: 8px;"><span style="color: #FF9500;">Terminal velocity:</span> <span style="color: #FF9500;">${terminalV} m/s</span> (not reached)</div>
-                            <div><span style="color: #FF3B30;">Impact speed:</span> <span style="color: #FF3B30;">${v_impact.toFixed(1)} m/s</span> = √(2 × 9.8 × ${h})</div>
-                        </div>`;
+                    // Create professional, clear calculation display
+                    const professionalCalculation = `
+                        <div style="text-align: center; padding: 20px 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
 
-                    const formula = `
-                        <div style="text-align: center; padding: 24px 0;">
-                            ${physicsExplanation}
+                            <div style="background: rgba(255,255,255,0.06); padding: 20px; border-radius: 12px; margin: 16px 0; text-align: left;">
+                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #87CEEB; text-align: center;">Drop Parameters</div>
 
-                            <div style="font-size: 28px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; margin-bottom: 24px; font-weight: 300; letter-spacing: 1px;">
-                                <span style="color: #007AFF;">KE</span>
-                                <span style="color: #FFF; margin: 0 8px;">=</span>
-                                <span style="color: #34C759;">½</span><span style="color: #FF9500;">m</span><span style="color: #FF3B30;">v</span><span style="color: #FFF;">²</span>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px; color: rgba(255,255,255,0.9);">
+                                    <div>
+                                        <div style="color: #87CEEB; font-weight: 600; margin-bottom: 8px;">Object Properties</div>
+                                        <div style="margin-bottom: 4px;">Height: <span style="color: #FFF;">${h} m</span></div>
+                                        <div style="margin-bottom: 4px;">Mass: <span style="color: #FFF;">${mass.toFixed(3)} kg</span></div>
+                                        <div>Terminal velocity: <span style="color: #FF9500;">${terminalV} m/s</span></div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #34C759; font-weight: 600; margin-bottom: 8px;">Fall Analysis</div>
+                                        <div style="margin-bottom: 4px;">Total time: <span style="color: #FFF;">${t_impact.toFixed(2)} s</span></div>
+                                        <div style="margin-bottom: 4px;">Terminal reached: <span style="color: ${reached_terminal ? '#34C759' : '#FF3B30'};">${reached_terminal ? 'Yes' : 'No'}</span></div>
+                                        <div>Impact speed: <span style="color: #FF3B30; font-weight: 600;">${v_impact.toFixed(1)} m/s</span></div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div style="font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin-bottom: 20px; color: rgba(255,255,255,0.7); font-weight: 400;">
-                                <span style="color: #FF9500;">m</span> = ${mass.toFixed(3)} kg &nbsp;&nbsp; <span style="color: #FF3B30;">v</span> = ${v_impact.toFixed(1)} m/s
+                            <div style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 12px; margin: 16px 0;">
+                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #87CEEB;">Impact Velocity Calculation</div>
+
+                                ${reached_terminal ?
+                                    `<div style="font-size: 20px; margin: 12px 0; letter-spacing: 0.5px;">
+                                        <span style="color: #87CEEB;">v</span><span style="color: #FFF;">_impact</span> =
+                                        <span style="color: #FF9500;">terminal velocity</span>
+                                    </div>
+
+                                    <div style="font-size: 16px; margin: 12px 0; color: rgba(255,255,255,0.8);">
+                                        = <span style="color: #FF9500;">${terminalV} m/s</span>
+                                    </div>
+
+                                    <div style="font-size: 24px; color: #007AFF; font-weight: 600; margin: 16px 0;">
+                                        = ${v_impact.toFixed(1)} m/s
+                                    </div>`
+                                    :
+                                    `<div style="font-size: 20px; margin: 12px 0; letter-spacing: 0.5px;">
+                                        <span style="color: #87CEEB;">v</span> = √(<span style="color: #34C759;">2</span><span style="color: #FF9500;">g</span><span style="color: #FF3B30;">h</span>)
+                                    </div>
+
+                                    <div style="font-size: 16px; margin: 12px 0; color: rgba(255,255,255,0.8);">
+                                        = √(<span style="color: #34C759;">2</span> × <span style="color: #FF9500;">9.8 m/s²</span> × <span style="color: #FF3B30;">${h} m</span>)
+                                    </div>
+
+                                    <div style="font-size: 24px; color: #007AFF; font-weight: 600; margin: 16px 0;">
+                                        = ${v_impact.toFixed(1)} m/s
+                                    </div>`
+                                }
+
+                                <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+                                    ${reached_terminal ? 'Air resistance limits velocity to terminal value' : 'Terminal velocity depends on object shape and air resistance'}
+                                </div>
                             </div>
 
-                            <div style="font-size: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin-bottom: 16px; color: #FFF; font-weight: 400;">
-                                = <span style="color: #34C759;">0.5</span> × <span style="color: #FF9500;">${mass.toFixed(3)} kg</span> × <span style="color: #FF3B30;">(${v_impact.toFixed(1)} m/s)</span><span style="color: #FFF;">²</span>
-                            </div>
+                            <div style="background: rgba(255,255,255,0.04); padding: 16px; border-radius: 12px; margin: 16px 0;">
+                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #87CEEB;">Kinetic Energy Calculation</div>
 
-                            <div style="font-size: 24px; color: #007AFF; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 500;">
-                                = ${ke.toFixed(1)} J
-                            </div>
+                                <div style="font-size: 20px; margin: 12px 0; letter-spacing: 0.5px;">
+                                    <span style="color: #007AFF;">KE</span> =
+                                    <span style="color: #34C759;">½</span><span style="color: #FF9500;">m</span><span style="color: #FF3B30;">v</span><span style="color: #FFF;">²</span>
+                                </div>
 
-                            <div style="font-size: 14px; margin-top: 20px; color: rgba(255,255,255,0.6); font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                                Reference: Human skull fracture ≈ 68 J
+                                <div style="font-size: 16px; margin: 12px 0; color: rgba(255,255,255,0.8);">
+                                    = <span style="color: #34C759;">0.5</span> × <span style="color: #FF9500;">${mass.toFixed(3)} kg</span> × <span style="color: #FF3B30;">(${v_impact.toFixed(1)} m/s)²</span>
+                                </div>
+
+                                <div style="font-size: 24px; color: #007AFF; font-weight: 600; margin: 16px 0;">
+                                    = ${ke.toFixed(1)} J
+                                </div>
+
+                                <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+                                    Reference: Human skull fracture threshold ≈ 68 J
+                                </div>
                             </div>
                         </div>
                     `;
-                    document.getElementById('stats').innerHTML = formula;
+                    document.getElementById('stats').innerHTML = professionalCalculation;
                     document.getElementById('verdict').style.display = 'block';
                 }
             }
