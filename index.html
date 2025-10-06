@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will It Hurt? — The Penny Drop</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: #fff;
+            background: linear-gradient(to bottom, #4A90E2, #87CEEB, #B6E5F5, #E0F6FF);
+        }
+        #scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        #container {
+            display: grid;
+            grid-template-columns: 250px 1fr 280px;
+            grid-template-rows: auto auto 1fr auto;
+            grid-template-areas:
+                "controls . graphs"
+                "info . graphs"
+                ". scene graphs"
+                "footer footer footer";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        #controls {
+            grid-area: controls;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            margin: 20px;
+            pointer-events: auto;
+            width: 218px;
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #graphs {
+            grid-area: graphs;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 0px;
+            padding: 15px;
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 20px;
+            overflow-y: auto;
+            width: 240px;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+        }
+        #graphs canvas {
+            width: 220px !important;
+            height: 120px !important;
+            background: transparent;
+            border-radius: 0px;
+            box-shadow: none;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            margin-bottom: 8px;
+            padding: 8px 0;
+        }
+        #graphs canvas:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        #footer {
+            grid-area: footer;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+        #footer a {
+            color: #87CEEB;
+            text-decoration: none;
+        }
+        #footer a:hover {
+            text-decoration: underline;
+        }
+        #info {
+            grid-area: info;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            max-width: 218px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            margin: 20px;
+            pointer-events: auto;
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #info h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        #info p {
+            margin: 3px 0;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+        #info code {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        #verdict {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            padding: 32px;
+            border-radius: 12px;
+            text-align: center;
+            z-index: 20;
+            display: none;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+            animation: popIn 0.6s ease-out;
+            pointer-events: auto;
+            max-width: 360px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        #custom-inputs {
+            margin-top: 15px;
+        }
+        input, select, button {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        button:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+        }
+        label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        @media (max-width: 1200px) {
+            #container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                grid-template-areas: 
+                    "controls"
+                    "info"
+                    "scene"
+                    "graphs";
+            }
+            #controls, #info {
+                width: auto;
+                max-width: none;
+                margin: 10px;
+            }
+            #graphs {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            #graphs canvas {
+                width: 250px !important;
+            }
+        }
+        @media (max-width: 600px) {
+            #graphs canvas {
+                width: calc(100vw - 40px) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="scene"></canvas>
+    <div id="container">
+        <div id="controls">
+            <label for="object">Object</label><br>
+            <select id="object">
+                <option value="feather">Feather (0.002 kg, 1 m/s)</option>
+                <option value="raindrop">Raindrop (0.001 kg, 9 m/s)</option>
+                <option value="penny" selected>Penny (0.0025 kg, 11 m/s)</option>
+                <option value="marble">Marble (0.005 kg, 18 m/s)</option>
+                <option value="golf_ball">Golf Ball (0.046 kg, 32 m/s)</option>
+                <option value="tennis_ball">Tennis Ball (0.057 kg, 28 m/s)</option>
+                <option value="hailstone">Large Hailstone (0.02 kg, 25 m/s)</option>
+                <option value="baseball">Baseball (0.145 kg, 45 m/s)</option>
+                <option value="basketball">Basketball (0.62 kg, 20 m/s)</option>
+                <option value="bowling_ball">Bowling Ball (7.26 kg, 35 m/s)</option>
+                <option value="custom">Custom</option>
+            </select>
+            <div id="custom-inputs" style="display: none;">
+                <label>Mass (kg)</label> <input id="mass" type="number" step="0.001" min="0.001" value="0.01"><br>
+                <label>Terminal V (m/s)</label> <input id="terminalV" type="number" min="1" value="10">
+            </div>
+            <label for="height">Drop height</label><br>
+            <input id="height" type="range" min="0" max="400" value="100">
+            <span id="height-value">100 m</span><br>
+            <button id="start">Start</button>
+            <button id="reset" disabled>Reset</button>
+        </div>
+        <div id="graphs">
+            <canvas id="vt-chart"></canvas>
+            <canvas id="st-chart"></canvas>
+            <canvas id="at-chart"></canvas>
+        </div>
+        <div id="info">
+            <h3>Physics Formulas</h3>
+            <p><code>g = 9.8 m/s²</code></p>
+            <p><code>v(t) = g · t</code> (until terminalV, then <code>v = terminalV</code>)</p>
+            <p><code>s(t) = ½ · g · t²</code> (until terminalV, then <code>s += terminalV · Δt</code>)</p>
+            <p><code>a(t) = g</code> (until terminalV, then <code>0</code>)</p>
+            <p><code>v_impact = min(√(2 · g · h), terminalV)</code></p>
+            <p><code>KE = ½ · m · v_impact²</code></p>
+            <p>Note: Simplified model for education.</p>
+        </div>
+        <div id="footer">
+            Made by <a href="https://zigao.wang" target="_blank">Zigao Wang</a> • Copyright © 2025 • MIT License • Educational purposes only
+        </div>
+    </div>
+    <div id="verdict">
+        <h2 id="verdict-text"></h2>
+        <p id="stats"></p>
+        <p>Thresholds are approximate for education only.</p>
+    </div>
+    <script>
+        const canvas = document.getElementById('scene');
+        const ctx = canvas.getContext('2d');
+        const g = 9.8;
+        const objects = {
+            feather: { mass: 0.002, terminalV: 1, color: '#FFFFFF', shape: 'feather' },
+            penny: { mass: 0.0025, terminalV: 11, color: '#B87333', shape: 'circle' },
+            raindrop: { mass: 0.001, terminalV: 9, color: '#87CEEB', shape: 'circle' },
+            marble: { mass: 0.005, terminalV: 18, color: '#4169E1', shape: 'circle' },
+            golf_ball: { mass: 0.046, terminalV: 32, color: '#FFFFFF', shape: 'circle' },
+            tennis_ball: { mass: 0.057, terminalV: 28, color: '#FFFF00', shape: 'circle' },
+            baseball: { mass: 0.145, terminalV: 45, color: '#FFFFFF', shape: 'circle' },
+            basketball: { mass: 0.62, terminalV: 20, color: '#FF8C00', shape: 'circle' },
+            bowling_ball: { mass: 7.26, terminalV: 35, color: '#000000', shape: 'circle' },
+            hailstone: { mass: 0.02, terminalV: 25, color: '#E6E6FA', shape: 'circle' },
+            custom: { mass: 0.01, terminalV: 10, color: '#333333', shape: 'circle' }
+        };
+        const outcomes = [
+            { min: 0, max: 1, text: 'Harmless', color: '#4CAF50', anim: 'small flinch' },
+            { min: 1, max: 10, text: 'Sting / minor pain', color: '#FFEB3B', anim: 'wince' },
+            { min: 10, max: 50, text: 'Possible injury', color: '#FF9800', anim: 'step back' },
+            { min: 50, max: 200, text: 'High risk of injury', color: '#F44336', anim: 'fall to one knee' },
+            { min: 200, max: Infinity, text: 'Potentially lethal', color: '#B71C1C', anim: 'fall down' }
+        ];
+
+        let running = false;
+        let t = 0;
+        let s = 0;
+        let v = 0;
+        let a = 0;
+        let lastTime = performance.now();
+        let lastPushTime = 0;
+        let mass, terminalV, h, t_term, s_term, t_impact, v_impact, ke, reached_terminal, objColor, objShape;
+        let outcome;
+        let particles = [];
+        let personAnimFrame = 0;
+        let personAnimLevel = 0;
+        let clouds = [];
+
+        // Graphs
+        let vtData = [];
+        let stData = [];
+        let atData = [];
+        let vtChart, stChart, atChart;
+
+        function initCharts() {
+            const chartOptions = {
+                animation: { duration: 0 },
+                elements: {
+                    point: {
+                        radius: 0,
+                        hoverRadius: 4
+                    },
+                    line: {
+                        tension: 0.2,
+                        borderWidth: 3
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Time (s)', color: '#333' },
+                        ticks: { color: '#333' },
+                        min: 0,
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    },
+                    y: {
+                        title: { display: true, color: '#333' },
+                        ticks: { color: '#333' },
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#333' },
+                        display: false
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            };
+            vtChart = new Chart(document.getElementById('vt-chart'), {
+                type: 'line',
+                data: { datasets: [{
+                    label: 'Velocity (m/s)',
+                    data: vtData,
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    fill: true,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                }] },
+                options: chartOptions
+            });
+            vtChart.options.scales.y.title.text = 'v (m/s)';
+            stChart = new Chart(document.getElementById('st-chart'), {
+                type: 'line',
+                data: { datasets: [{
+                    label: 'Distance (m)',
+                    data: stData,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    fill: true,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                }] },
+                options: chartOptions
+            });
+            stChart.options.scales.y.title.text = 's (m)';
+            atChart = new Chart(document.getElementById('at-chart'), {
+                type: 'line',
+                data: { datasets: [{
+                    label: 'Acceleration (m/s²)',
+                    data: atData,
+                    borderColor: '#F44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    fill: true,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                }] },
+                options: chartOptions
+            });
+            atChart.options.scales.y.title.text = 'a (m/s²)';
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            generateClouds();
+        }
+
+        function generateClouds() {
+            clouds = [];
+            for (let i = 0; i < 6; i++) {
+                clouds.push({
+                    x: Math.random() * (canvas.width + 300) - 150,
+                    y: 50 + Math.random() * (canvas.height / 4),
+                    size: 25 + Math.random() * 35,
+                    speed: 0.08 + Math.random() * 0.15,
+                    opacity: 0.4 + Math.random() * 0.3,
+                    puffCount: 3 + Math.floor(Math.random() * 3)
+                });
+            }
+        }
+
+        function drawClouds() {
+            clouds.forEach(cloud => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${cloud.opacity})`;
+                drawSingleCloud(cloud);
+            });
+        }
+
+        function drawSingleCloud(cloud) {
+            // Create stable cloud shape without random elements during drawing
+            const baseSize = cloud.size;
+
+            // Main cloud body
+            ctx.beginPath();
+            ctx.ellipse(cloud.x, cloud.y, baseSize * 1.3, baseSize * 0.7, 0, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Fixed positioned puffs for stable appearance
+            const puffPositions = [
+                { x: -0.6, y: 0.1, size: 0.8 },
+                { x: 0.6, y: -0.1, size: 0.7 },
+                { x: -0.3, y: -0.4, size: 0.6 },
+                { x: 0.4, y: -0.3, size: 0.5 }
+            ];
+
+            puffPositions.slice(0, cloud.puffCount).forEach(puff => {
+                ctx.beginPath();
+                ctx.ellipse(
+                    cloud.x + baseSize * puff.x,
+                    cloud.y + baseSize * puff.y,
+                    baseSize * puff.size * 0.8,
+                    baseSize * puff.size * 0.6,
+                    0, 0, 2 * Math.PI
+                );
+                ctx.fill();
+            });
+        }
+
+        function drawTower() {
+            const towerWidth = 140;
+            const towerX = canvas.width / 2 - towerWidth / 2;
+            const towerTop = 30;
+            const towerHeight = canvas.height - 80;
+
+            // Tower body with gradient
+            const gradient = ctx.createLinearGradient(towerX, towerTop, towerX + towerWidth, towerTop);
+            gradient.addColorStop(0, '#A9A9A9');
+            gradient.addColorStop(1, '#808080');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(towerX, towerTop, towerWidth, towerHeight);
+
+            // Windows
+            ctx.fillStyle = 'rgba(173, 216, 230, 0.6)';
+            for (let floor = 0; floor < 25; floor++) {
+                for (let win = 0; win < 5; win++) {
+                    ctx.fillRect(towerX + 15 + win * 22, towerTop + 15 + floor * (towerHeight / 25), 18, 8);
+                }
+            }
+
+            // Antenna
+            ctx.strokeStyle = '#696969';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, towerTop);
+            ctx.lineTo(canvas.width / 2, towerTop - 40);
+            ctx.stroke();
+        }
+
+        function drawGround() {
+            const gradient = ctx.createLinearGradient(0, canvas.height - 70, 0, canvas.height);
+            gradient.addColorStop(0, '#228B22');
+            gradient.addColorStop(1, '#006400');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+        }
+
+        function drawScene() {
+            // Clear and draw sky gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#4A90E2');
+            gradient.addColorStop(0.3, '#87CEEB');
+            gradient.addColorStop(0.7, '#B6E5F5');
+            gradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawClouds();
+            drawTower();
+            drawGround();
+
+            // People - just one person in the center
+            drawPerson(canvas.width / 2, canvas.height - 100, !running && t >= t_impact);
+
+            // Object
+            if (running || (!running && t >= t_impact && t_impact > 0)) {
+                const objX = canvas.width / 2;
+                const objY = 30 + (s / h) * (canvas.height - 150);
+                ctx.fillStyle = objColor || 'black';
+                if (objShape === 'feather') {
+                    ctx.save();
+                    ctx.translate(objX, objY);
+                    ctx.rotate(Math.PI / 4);
+                    ctx.beginPath();
+                    ctx.moveTo(0, -15);
+                    ctx.lineTo(0, 15);
+                    ctx.strokeStyle = '#DDD';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    for (let i = -10; i <= 10; i += 5) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, i);
+                        ctx.lineTo(8, i - 4);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(objX, Math.min(objY, canvas.height - 100), 10, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetY = 2;
+                }
+
+                // Speed label
+                if (running) {
+                    ctx.font = '16px system-ui';
+                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                    ctx.lineWidth = 1;
+                    const speedText = `${v.toFixed(1)} m/s`;
+                    ctx.fillText(speedText, objX + 20, objY + 5);
+                    ctx.strokeText(speedText, objX + 20, objY + 5);
+                }
+            }
+
+            // Particles on impact
+            if (particles.length > 0) {
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3;
+                    p.life -= 1;
+                    if (p.life > 0) {
+                        ctx.fillStyle = `rgba(255, 215, 0, ${p.life / 40})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 4, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                });
+                particles = particles.filter(p => p.life > 0);
+            }
+
+            if (!running && t >= t_impact && personAnimFrame < 20) {
+                personAnimFrame += 0.3;
+            }
+        }
+
+        function drawPerson(x, y, animate) {
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 4;
+            ctx.fillStyle = '#444';
+
+            let bodyAngle = 0;
+            let armAngleL = -25;
+            let armAngleR = 25;
+            let legAngleL = -8;
+            let legAngleR = 8;
+            let headAngle = 0;
+            let stepBack = 0;
+            let kneeBend = 0;
+
+            if (animate) {
+                const animProgress = Math.min(personAnimFrame / 10, 1);
+                switch (personAnimLevel) {
+                    case 0:
+                        armAngleL = -25 + Math.sin(personAnimFrame * 0.6) * 12;
+                        armAngleR = 25 - Math.sin(personAnimFrame * 0.6) * 12;
+                        break;
+                    case 1:
+                        headAngle = Math.sin(personAnimFrame * 0.4) * 6;
+                        bodyAngle = Math.sin(personAnimFrame * 0.4) * 4;
+                        break;
+                    case 2:
+                        stepBack = animProgress * 25;
+                        legAngleL = -8 - animProgress * 25;
+                        legAngleR = 8 + animProgress * 25;
+                        break;
+                    case 3:
+                        kneeBend = animProgress * 25;
+                        bodyAngle = animProgress * 20;
+                        y += kneeBend;
+                        legAngleR = 50 * animProgress;
+                        break;
+                    case 4:
+                        bodyAngle = 90 * animProgress;
+                        y += 35 * animProgress;
+                        armAngleL = -25 + 70 * animProgress;
+                        armAngleR = 25 + 70 * animProgress;
+                        legAngleL = 0;
+                        legAngleR = 0;
+                        break;
+                }
+            }
+
+            ctx.save();
+            ctx.translate(x + 12 + stepBack, y + 25);
+            ctx.rotate(bodyAngle * Math.PI / 180);
+            ctx.translate(-(x + 12 + stepBack), -(y + 25));
+
+            // Head
+            ctx.save();
+            ctx.translate(x + 12, y);
+            ctx.rotate(headAngle * Math.PI / 180);
+            ctx.beginPath();
+            ctx.arc(0, 0, 14, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(x + 12, y + 20);
+            ctx.lineTo(x + 12, y + 50);
+            ctx.stroke();
+
+            // Arms
+            ctx.save();
+            ctx.translate(x + 12, y + 30);
+            ctx.rotate(armAngleL * Math.PI / 180);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-18, 0);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate(x + 12, y + 30);
+            ctx.rotate(armAngleR * Math.PI / 180);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(18, 0);
+            ctx.stroke();
+            ctx.restore();
+
+            // Legs
+            ctx.save();
+            ctx.translate(x + 12, y + 50 + kneeBend);
+            ctx.rotate(legAngleL * Math.PI / 180);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-12, 25 - kneeBend / 2);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate(x + 12, y + 50 + kneeBend);
+            ctx.rotate(legAngleR * Math.PI / 180);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(12, 25 - kneeBend / 2);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        function startDrop() {
+            const objType = document.getElementById('object').value;
+            let selectedObj;
+            if (objType === 'custom') {
+                mass = parseFloat(document.getElementById('mass').value);
+                terminalV = parseFloat(document.getElementById('terminalV').value);
+                objColor = '#333333';
+                objShape = 'circle';
+            } else {
+                selectedObj = objects[objType];
+                mass = selectedObj.mass;
+                terminalV = selectedObj.terminalV;
+                objColor = selectedObj.color;
+                objShape = selectedObj.shape;
+            }
+            h = parseFloat(document.getElementById('height').value);
+            if (isNaN(mass) || isNaN(terminalV) || mass <= 0 || terminalV <= 0 || h < 0) {
+                alert('Invalid inputs');
+                return;
+            }
+
+            t_term = terminalV / g;
+            s_term = (terminalV ** 2) / (2 * g);
+            if (h <= s_term) {
+                t_impact = Math.sqrt(2 * h / g);
+                v_impact = Math.sqrt(2 * g * h);
+            } else {
+                t_impact = t_term + (h - s_term) / terminalV;
+                v_impact = terminalV;
+            }
+            ke = 0.5 * mass * (v_impact ** 2);
+            reached_terminal = h > s_term;
+
+            outcome = outcomes.find(o => ke >= o.min && ke < o.max);
+            personAnimLevel = outcomes.indexOf(outcome);
+
+            running = true;
+            t = 0;
+            s = 0;
+            v = 0;
+            a = 0;
+            vtData = [];
+            stData = [];
+            atData = [];
+            particles = [];
+            personAnimFrame = 0;
+            document.getElementById('start').disabled = true;
+            document.getElementById('reset').disabled = false;
+            document.getElementById('object').disabled = true;
+            document.getElementById('height').disabled = true;
+            document.getElementById('verdict').style.display = 'none';
+            lastTime = performance.now();
+            lastPushTime = 0;
+        }
+
+        function resetDrop() {
+            running = false;
+            document.getElementById('start').disabled = false;
+            document.getElementById('reset').disabled = true;
+            document.getElementById('object').disabled = false;
+            document.getElementById('height').disabled = false;
+            t = 0;
+            vtData = [];
+            stData = [];
+            atData = [];
+            vtChart.options.scales.x.max = undefined;
+            stChart.options.scales.x.max = undefined;
+            atChart.options.scales.x.max = undefined;
+            vtChart.update();
+            stChart.update();
+            atChart.update();
+            particles = [];
+            personAnimFrame = 0;
+        }
+
+        function animate(time) {
+            const dt = (time - lastTime) / 1000;
+            lastTime = time;
+
+            // Always animate clouds
+            clouds.forEach(cloud => {
+                cloud.x += cloud.speed;
+                if (cloud.x > canvas.width + cloud.size * 2) {
+                    cloud.x = -cloud.size * 2;
+                    cloud.y = 50 + Math.random() * (canvas.height / 4);
+                }
+            });
+
+            if (running) {
+                t += dt;
+
+                if (t <= t_term) {
+                    v = g * t;
+                    s = 0.5 * g * (t ** 2);
+                    a = g;
+                } else {
+                    v = terminalV;
+                    s = s_term + terminalV * (t - t_term);
+                    a = 0;
+                }
+
+                if (t - lastPushTime >= 0.05) {  // Downsample to every 0.05s
+                    vtData.push({ x: t, y: v });
+                    stData.push({ x: t, y: s });
+                    atData.push({ x: t, y: a });
+                    lastPushTime = t;
+                }
+
+                vtChart.data.datasets[0].data = vtData;
+                stChart.data.datasets[0].data = stData;
+                atChart.data.datasets[0].data = atData;
+                vtChart.update('none');
+                stChart.update('none');
+                atChart.update('none');
+
+                if (s >= h) {
+                    running = false;
+                    // Only show particles for harmless or minor impacts (ke < 50J)
+                    if (ke < 50) {
+                        for (let i = 0; i < 40; i++) {
+                            particles.push({
+                                x: canvas.width / 2,
+                                y: canvas.height - 100,
+                                vx: (Math.random() - 0.5) * 20,
+                                vy: (Math.random() - 0.5) * 20 - 12,
+                                life: 40 + Math.random() * 30
+                            });
+                        }
+                    }
+                    document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
+                    document.getElementById('verdict-text').style.color = outcome.color;
+                    document.getElementById('stats').innerHTML = `Impact speed: ${v_impact.toFixed(1)} m/s<br>KE: ${ke.toFixed(1)} J → ${outcome.text.toLowerCase()} likely<br>Time: ${t.toFixed(2)} s<br>Terminal velocity reached: ${reached_terminal ? 'Yes' : 'No'}`;
+                    document.getElementById('verdict').style.display = 'block';
+                }
+            }
+
+            drawScene();
+            requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawScene();
+        });
+        document.getElementById('object').addEventListener('change', (e) => {
+            const custom = e.target.value === 'custom';
+            document.getElementById('custom-inputs').style.display = custom ? 'block' : 'none';
+        });
+        document.getElementById('height').addEventListener('input', (e) => {
+            document.getElementById('height-value').textContent = `${e.target.value} m`;
+        });
+        document.getElementById('start').addEventListener('click', startDrop);
+        document.getElementById('reset').addEventListener('click', resetDrop);
+
+        // Init
+        resizeCanvas();
+        initCharts();
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
