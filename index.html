@@ -584,6 +584,10 @@
                 <canvas id="st-chart"></canvas>
             </div>
             <div class="chart-container">
+                <div class="chart-title">Height vs Time</div>
+                <canvas id="ht-chart"></canvas>
+            </div>
+            <div class="chart-container">
                 <div class="chart-title">Acceleration vs Time</div>
                 <canvas id="at-chart"></canvas>
             </div>
@@ -641,8 +645,9 @@
         // Graphs
         let vtData = [];
         let stData = [];
+        let htData = [];
         let atData = [];
-        let vtChart, stChart, atChart;
+        let vtChart, stChart, htChart, atChart;
 
         function initCharts() {
             const chartOptions = {
@@ -714,6 +719,22 @@
                 options: chartOptions
             });
             stChart.options.scales.y.title.text = 's (m)';
+            htChart = new Chart(document.getElementById('ht-chart'), {
+                type: 'line',
+                data: { datasets: [{
+                    label: 'Height (m)',
+                    data: htData,
+                    borderColor: '#FF9F0A',
+                    backgroundColor: 'rgba(255, 159, 10, 0.1)',
+                    fill: true,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                }] },
+                options: chartOptions
+            });
+            htChart.options.scales.y.title.text = 'h (m)';
             atChart = new Chart(document.getElementById('at-chart'), {
                 type: 'line',
                 data: { datasets: [{
@@ -1132,6 +1153,7 @@
             a = g; // Initial acceleration is g
             vtData = [{ x: 0, y: 0 }]; // Start with initial point at t=0
             stData = [{ x: 0, y: 0 }];
+            htData = [{ x: 0, y: h }]; // Start at full height
             atData = [{ x: 0, y: g }];
             particles = [];
             personAnimFrame = 0;
@@ -1160,12 +1182,15 @@
             t = 0;
             vtData = [];
             stData = [];
+            htData = [];
             atData = [];
             vtChart.options.scales.x.max = undefined;
             stChart.options.scales.x.max = undefined;
+            htChart.options.scales.x.max = undefined;
             atChart.options.scales.x.max = undefined;
             vtChart.update();
             stChart.update();
+            htChart.update();
             atChart.update();
             particles = [];
             personAnimFrame = 0;
@@ -1200,15 +1225,18 @@
                 if (t - lastPushTime >= 0.05) {  // Downsample to every 0.05s
                     vtData.push({ x: t, y: v });
                     stData.push({ x: t, y: s });
+                    htData.push({ x: t, y: h - s }); // Height above ground decreases as distance increases
                     atData.push({ x: t, y: a });
                     lastPushTime = t;
                 }
 
                 vtChart.data.datasets[0].data = vtData;
                 stChart.data.datasets[0].data = stData;
+                htChart.data.datasets[0].data = htData;
                 atChart.data.datasets[0].data = atData;
                 vtChart.update('none');
                 stChart.update('none');
+                htChart.update('none');
                 atChart.update('none');
 
                 if (s >= h) {
@@ -1279,7 +1307,7 @@
                                     }
                                 </div>
 
-                                <div style="background: rgba(255, 159, 10, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(255, 159, 10, 0.2);">
+                                <div style="background: rgba(255, 159, 10, 0.08); border-radius: 16px; padding: 24px; margin: 0px 0; border: 1px solid rgba(255, 159, 10, 0.2);">
                                     <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #FF9F0A; letter-spacing: -0.3px;">Kinetic Energy</div>
 
                                     <div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
