@@ -696,7 +696,7 @@
 
             // Head
             ctx.save();
-            ctx.translate(x + 12, y + 14);
+            ctx.translate(x + 12, y + 8);
             ctx.rotate(headAngle * Math.PI / 180);
             ctx.beginPath();
             ctx.arc(0, 0, 14, 0, 2 * Math.PI);
@@ -883,9 +883,23 @@
                     document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
                     document.getElementById('verdict-text').style.color = outcome.color;
 
-                    // Create Apple-style clean formula display
+                    // Create Apple-style physics explanation
+                    const physicsExplanation = reached_terminal ?
+                        `<div style="font-size: 15px; margin-bottom: 16px; color: rgba(255,255,255,0.8); font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.4;">
+                            <div style="margin-bottom: 8px;"><span style="color: #34C759;">Phase 1:</span> Accelerated at <span style="color: #34C759;">9.8 m/s²</span> for <span style="color: #34C759;">${t_term.toFixed(2)} s</span></div>
+                            <div style="margin-bottom: 8px;"><span style="color: #FF9500;">Phase 2:</span> Reached terminal velocity <span style="color: #FF9500;">${terminalV} m/s</span></div>
+                            <div><span style="color: #FF3B30;">Impact speed:</span> Limited to <span style="color: #FF3B30;">${v_impact.toFixed(1)} m/s</span> (terminal velocity)</div>
+                        </div>` :
+                        `<div style="font-size: 15px; margin-bottom: 16px; color: rgba(255,255,255,0.8); font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.4;">
+                            <div style="margin-bottom: 8px;"><span style="color: #34C759;">Acceleration:</span> Constant <span style="color: #34C759;">9.8 m/s²</span> throughout fall</div>
+                            <div style="margin-bottom: 8px;"><span style="color: #FF9500;">Terminal velocity:</span> <span style="color: #FF9500;">${terminalV} m/s</span> (not reached)</div>
+                            <div><span style="color: #FF3B30;">Impact speed:</span> <span style="color: #FF3B30;">${v_impact.toFixed(1)} m/s</span> = √(2 × 9.8 × ${h})</div>
+                        </div>`;
+
                     const formula = `
                         <div style="text-align: center; padding: 24px 0;">
+                            ${physicsExplanation}
+
                             <div style="font-size: 28px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; margin-bottom: 24px; font-weight: 300; letter-spacing: 1px;">
                                 <span style="color: #007AFF;">KE</span>
                                 <span style="color: #FFF; margin: 0 8px;">=</span>
