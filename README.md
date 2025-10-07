@@ -2,6 +2,9 @@
 
 A realistic physics simulator that demonstrates the effects of dropping objects from various heights in different environments.
 
+<img width="590.5" height="354.2" alt="CleanShot 2025-10-07 at 18 51 43@2x" src="https://github.com/user-attachments/assets/6a5f24d9-23d7-4171-84d5-89edd921e255" />
+<img width="590.5" height="354.2" alt="CleanShot 2025-10-07 at 18 52 05@2x" src="https://github.com/user-attachments/assets/34cfc0fc-f082-4c4c-8158-f2efa0b63ac7" />
+
 ## Features
 
 - **Single & Dual Drop Modes**: Compare how different objects fall
