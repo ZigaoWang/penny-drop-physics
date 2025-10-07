@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will It Hurt? — The Penny Drop</title>
+    <title>Physics Drop Simulator</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* CSS Reset and Global Styles */
@@ -98,9 +98,10 @@
         #container {
             display: grid;
             grid-template-columns: 300px 1fr 390px;
-            grid-template-rows: auto 1fr auto;
+            grid-template-rows: auto auto 1fr auto;
             grid-template-areas:
                 "controls . graphs"
+                "dual-results . graphs"
                 ". scene graphs"
                 "footer footer footer";
             position: absolute;
@@ -128,6 +129,29 @@
             margin: 24px;
             width: 252px;
             height: fit-content;
+        }
+
+        #dual-results {
+            grid-area: dual-results;
+            width: 252px;
+            height: fit-content;
+            margin: 0 24px 16px 24px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            border-left: 4px solid;
+        }
+
+        .result-summary {
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
         }
 
         #graphs {
@@ -533,28 +557,95 @@
     <div id="container">
         <div id="controls" class="glass-panel">
             <div class="form-group">
-                <label for="object" class="form-label">Object</label>
-                <select id="object" class="form-control">
-                    <option value="feather">Feather (0.002 kg, 1 m/s)</option>
-                    <option value="raindrop">Raindrop (0.001 kg, 9 m/s)</option>
-                    <option value="penny" selected>Penny (0.0025 kg, 11 m/s)</option>
-                    <option value="marble">Marble (0.005 kg, 18 m/s)</option>
-                    <option value="golf_ball">Golf Ball (0.046 kg, 32 m/s)</option>
-                    <option value="tennis_ball">Tennis Ball (0.057 kg, 28 m/s)</option>
-                    <option value="hailstone">Large Hailstone (0.02 kg, 25 m/s)</option>
-                    <option value="baseball">Baseball (0.145 kg, 45 m/s)</option>
-                    <option value="basketball">Basketball (0.62 kg, 20 m/s)</option>
-                    <option value="bowling_ball">Bowling Ball (7.26 kg, 35 m/s)</option>
-                    <option value="custom">Custom</option>
+                <label for="simulation-mode" class="form-label">Simulation Mode</label>
+                <select id="simulation-mode" class="form-control">
+                    <option value="single" selected>Single Object</option>
+                    <option value="dual">Dual Drop (Comparison)</option>
                 </select>
-                <div id="custom-inputs">
+            </div>
+
+            <div id="single-object-controls">
+                <div class="form-group">
+                    <label for="object" class="form-label">Object</label>
+                    <select id="object" class="form-control">
+                        <option value="feather">Feather (0.002 kg, 1 m/s)</option>
+                        <option value="raindrop">Raindrop (0.001 kg, 9 m/s)</option>
+                        <option value="penny" selected>Penny (0.0025 kg, 11 m/s)</option>
+                        <option value="marble">Marble (0.005 kg, 18 m/s)</option>
+                        <option value="golf_ball">Golf Ball (0.046 kg, 32 m/s)</option>
+                        <option value="tennis_ball">Tennis Ball (0.057 kg, 28 m/s)</option>
+                        <option value="hailstone">Large Hailstone (0.02 kg, 25 m/s)</option>
+                        <option value="baseball">Baseball (0.145 kg, 45 m/s)</option>
+                        <option value="basketball">Basketball (0.62 kg, 20 m/s)</option>
+                        <option value="bowling_ball">Bowling Ball (7.26 kg, 35 m/s)</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <div id="custom-inputs">
+                        <div class="form-group">
+                            <label for="mass" class="form-label">Mass (kg)</label>
+                            <input id="mass" type="number" step="0.001" min="0.001" value="0.01" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="terminalV" class="form-label">Terminal Velocity (m/s)</label>
+                            <input id="terminalV" type="number" min="1" value="10" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dual-object-controls" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Object 1 (Left)</label>
+                    <select id="object1" class="form-control">
+                        <option value="feather" selected>Feather (0.002 kg, 1 m/s)</option>
+                        <option value="raindrop">Raindrop (0.001 kg, 9 m/s)</option>
+                        <option value="penny">Penny (0.0025 kg, 11 m/s)</option>
+                        <option value="marble">Marble (0.005 kg, 18 m/s)</option>
+                        <option value="golf_ball">Golf Ball (0.046 kg, 32 m/s)</option>
+                        <option value="tennis_ball">Tennis Ball (0.057 kg, 28 m/s)</option>
+                        <option value="hailstone">Large Hailstone (0.02 kg, 25 m/s)</option>
+                        <option value="baseball">Baseball (0.145 kg, 45 m/s)</option>
+                        <option value="basketball">Basketball (0.62 kg, 20 m/s)</option>
+                        <option value="bowling_ball">Bowling Ball (7.26 kg, 35 m/s)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Object 2 (Right)</label>
+                    <select id="object2" class="form-control">
+                        <option value="feather">Feather (0.002 kg, 1 m/s)</option>
+                        <option value="raindrop">Raindrop (0.001 kg, 9 m/s)</option>
+                        <option value="penny">Penny (0.0025 kg, 11 m/s)</option>
+                        <option value="marble">Marble (0.005 kg, 18 m/s)</option>
+                        <option value="golf_ball">Golf Ball (0.046 kg, 32 m/s)</option>
+                        <option value="tennis_ball">Tennis Ball (0.057 kg, 28 m/s)</option>
+                        <option value="hailstone">Large Hailstone (0.02 kg, 25 m/s)</option>
+                        <option value="baseball" selected>Baseball (0.145 kg, 45 m/s)</option>
+                        <option value="basketball">Basketball (0.62 kg, 20 m/s)</option>
+                        <option value="bowling_ball">Bowling Ball (7.26 kg, 35 m/s)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="environment" class="form-label">Environment</label>
+                <select id="environment" class="form-control">
+                    <option value="earth" selected>Earth (9.8 m/s², Air Resistance)</option>
+                    <option value="earth-vacuum">Earth Vacuum (9.8 m/s², No Air)</option>
+                    <option value="moon">Moon (1.6 m/s², No Atmosphere)</option>
+                    <option value="mars">Mars (3.7 m/s², Thin Atmosphere)</option>
+                    <option value="jupiter">Jupiter (24.8 m/s², Dense Atmosphere)</option>
+                    <option value="custom-env">Custom Environment</option>
+                </select>
+                <div id="custom-env-inputs" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border);">
                     <div class="form-group">
-                        <label for="mass" class="form-label">Mass (kg)</label>
-                        <input id="mass" type="number" step="0.001" min="0.001" value="0.01" class="form-control">
+                        <label for="custom-gravity" class="form-label">Gravity (m/s²)</label>
+                        <input id="custom-gravity" type="number" step="0.1" min="0.1" value="9.8" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="terminalV" class="form-label">Terminal Velocity (m/s)</label>
-                        <input id="terminalV" type="number" min="1" value="10" class="form-control">
+                        <label for="air-resistance" class="form-label">Air Resistance Factor</label>
+                        <input id="air-resistance" type="range" min="0" max="2" step="0.1" value="1" style="flex: 1;">
+                        <span class="range-value" id="air-resistance-value">1.0</span>
+                        <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">0 = Vacuum, 1 = Earth atmosphere, 2 = Dense atmosphere</div>
                     </div>
                 </div>
             </div>
@@ -572,6 +663,12 @@
                 <button id="start" class="btn btn-success">Start Simulation</button>
                 <button id="reset" class="btn btn-warning" disabled>Reset</button>
             </div>
+        </div>
+
+        <!-- Dual object results panel -->
+        <div id="dual-results" class="glass-panel" style="display: none; grid-area: controls; margin-top: 16px; padding: 20px;">
+            <div class="text-title-2" style="margin-bottom: 16px; text-align: center;">Comparison Results</div>
+            <div id="dual-results-content"></div>
         </div>
 
         <div id="graphs" class="glass-panel">
@@ -606,7 +703,19 @@
     <script>
         const canvas = document.getElementById('scene');
         const ctx = canvas.getContext('2d');
-        const g = 9.8;
+        let g = 9.8; // Will be updated based on environment
+        let airResistanceFactor = 1.0; // 0 = vacuum, 1 = Earth, 2 = dense
+
+        // Environment definitions
+        const environments = {
+            earth: { gravity: 9.8, airResistance: 1.0 },
+            'earth-vacuum': { gravity: 9.8, airResistance: 0.0 },
+            moon: { gravity: 1.6, airResistance: 0.0 },
+            mars: { gravity: 3.7, airResistance: 0.3 },
+            jupiter: { gravity: 24.8, airResistance: 1.5 },
+            'custom-env': { gravity: 9.8, airResistance: 1.0 }
+        };
+
         const objects = {
             feather: { mass: 0.002, terminalV: 1, color: '#FFFFFF', shape: 'feather' },
             penny: { mass: 0.0025, terminalV: 11, color: '#B87333', shape: 'circle' },
@@ -618,35 +727,34 @@
             basketball: { mass: 0.62, terminalV: 20, color: '#FF8C00', shape: 'circle' },
             bowling_ball: { mass: 7.26, terminalV: 35, color: '#000000', shape: 'circle' },
             hailstone: { mass: 0.02, terminalV: 25, color: '#E6E6FA', shape: 'circle' },
+            hammer: { mass: 0.5, terminalV: 50, color: '#8B4513', shape: 'hammer' },
             custom: { mass: 0.01, terminalV: 10, color: '#333333', shape: 'circle' }
         };
+
         const outcomes = [
             { min: 0, max: 1, text: 'Harmless', color: '#4CAF50', anim: 'small flinch' },
-            { min: 1, max: 10, text: 'Sting / minor pain', color: '#FFEB3B', anim: 'wince' },
+            { min: 1, max: 10, text: 'Sting / minor pain', color: '#FF8C00', anim: 'wince' },
             { min: 10, max: 50, text: 'Possible injury', color: '#FF9800', anim: 'step back' },
             { min: 50, max: 200, text: 'High risk of injury', color: '#F44336', anim: 'fall to one knee' },
             { min: 200, max: Infinity, text: 'Potentially lethal', color: '#B71C1C', anim: 'fall down' }
         ];
 
         let running = false;
-        let t = 0;
-        let s = 0;
-        let v = 0;
-        let a = 0;
+        let simulationMode = 'single';
+        let dropObjects = []; // Array to hold one or more objects
         let lastTime = performance.now();
-        let lastPushTime = 0;
-        let mass, terminalV, h, t_term, s_term, t_impact, v_impact, ke, reached_terminal, objColor, objShape;
-        let outcome;
         let particles = [];
         let personAnimFrame = 0;
         let personAnimLevel = 0;
         let clouds = [];
 
-        // Graphs
-        let vtData = [];
-        let stData = [];
-        let htData = [];
-        let atData = [];
+        // Graphs - support multiple objects
+        let chartData = {
+            velocity: [], // Array of datasets for each object
+            distance: [],
+            height: [],
+            acceleration: []
+        };
         let vtChart, stChart, htChart, atChart;
 
         function initCharts() {
@@ -679,7 +787,7 @@
                 plugins: {
                     legend: {
                         labels: { color: '#333' },
-                        display: false
+                        display: false // Start with legend disabled, enable for multi-object
                     }
                 },
                 interaction: {
@@ -687,69 +795,33 @@
                     mode: 'index'
                 }
             };
+
             vtChart = new Chart(document.getElementById('vt-chart'), {
                 type: 'line',
-                data: { datasets: [{
-                    label: 'Velocity (m/s)',
-                    data: vtData,
-                    borderColor: '#2196F3',
-                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    borderWidth: 3
-                }] },
-                options: chartOptions
+                data: { datasets: [] },
+                options: { ...chartOptions }
             });
             vtChart.options.scales.y.title.text = 'v (m/s)';
+
             stChart = new Chart(document.getElementById('st-chart'), {
                 type: 'line',
-                data: { datasets: [{
-                    label: 'Distance (m)',
-                    data: stData,
-                    borderColor: '#4CAF50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    borderWidth: 3
-                }] },
-                options: chartOptions
+                data: { datasets: [] },
+                options: { ...chartOptions }
             });
             stChart.options.scales.y.title.text = 's (m)';
+
             htChart = new Chart(document.getElementById('ht-chart'), {
                 type: 'line',
-                data: { datasets: [{
-                    label: 'Height (m)',
-                    data: htData,
-                    borderColor: '#FF9F0A',
-                    backgroundColor: 'rgba(255, 159, 10, 0.1)',
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    borderWidth: 3
-                }] },
-                options: chartOptions
+                data: { datasets: [] },
+                options: { ...chartOptions }
             });
             htChart.options.scales.y.title.text = 'h (m)';
             htChart.options.scales.y.min = 0;
+
             atChart = new Chart(document.getElementById('at-chart'), {
                 type: 'line',
-                data: { datasets: [{
-                    label: 'Acceleration (m/s²)',
-                    data: atData,
-                    borderColor: '#F44336',
-                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 0,
-                    pointHoverRadius: 4,
-                    borderWidth: 3
-                }] },
-                options: chartOptions
+                data: { datasets: [] },
+                options: { ...chartOptions }
             });
             atChart.options.scales.y.title.text = 'a (m/s²)';
         }
@@ -897,70 +969,104 @@
             ctx.lineJoin = 'miter';
             ctx.miterLimit = 10;
 
-            // Draw sky gradient background
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#4A90E2');
-            gradient.addColorStop(0.3, '#87CEEB');
-            gradient.addColorStop(0.7, '#B6E5F5');
-            gradient.addColorStop(1, '#E0F6FF');
+            // Draw sky gradient background based on environment
+            const envElement = document.getElementById('environment');
+            const envType = envElement ? envElement.value : 'earth';
+            let gradient;
+
+            switch(envType) {
+                case 'moon':
+                    gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#000014');
+                    gradient.addColorStop(0.3, '#1a1a2e');
+                    gradient.addColorStop(0.7, '#2f2f3f');
+                    gradient.addColorStop(1, '#16213e');
+                    break;
+                case 'mars':
+                    gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#8B4513');
+                    gradient.addColorStop(0.3, '#CD853F');
+                    gradient.addColorStop(0.7, '#DEB887');
+                    gradient.addColorStop(1, '#F4A460');
+                    break;
+                case 'jupiter':
+                    gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#FF6B35');
+                    gradient.addColorStop(0.3, '#F7931E');
+                    gradient.addColorStop(0.7, '#FFD700');
+                    gradient.addColorStop(1, '#FFA500');
+                    break;
+                default:
+                    gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#4A90E2');
+                    gradient.addColorStop(0.3, '#87CEEB');
+                    gradient.addColorStop(0.7, '#B6E5F5');
+                    gradient.addColorStop(1, '#E0F6FF');
+            }
+
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            drawClouds();
+            // Only draw clouds if not on the Moon
+            if (envType !== 'moon') {
+                drawClouds();
+            }
             drawTower();
             drawGround();
 
             // People - just one person in the center
-            drawPerson(canvas.width / 2, canvas.height - 130, !running && t >= t_impact);
+            const shouldAnimate = !running && dropObjects.length > 0 && dropObjects.some(obj => obj.t >= obj.t_impact);
+            drawPerson(canvas.width / 2, canvas.height - 130, shouldAnimate);
 
             ctx.restore();
 
-            // Object
-            if (running || (!running && t > 0)) {
-                const objX = canvas.width / 2;
-                const objY = 30 + (s / h) * (canvas.height - 180);
-                ctx.fillStyle = objColor || 'black';
-                if (objShape === 'feather') {
-                    ctx.save();
-                    ctx.translate(objX, objY);
-                    ctx.rotate(Math.PI / 4);
-                    ctx.beginPath();
-                    ctx.moveTo(0, -15);
-                    ctx.lineTo(0, 15);
-                    ctx.strokeStyle = '#DDD';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    for (let i = -10; i <= 10; i += 5) {
-                        ctx.beginPath();
-                        ctx.moveTo(0, i);
-                        ctx.lineTo(8, i - 4);
-                        ctx.stroke();
-                    }
-                    ctx.restore();
-                } else {
-                    ctx.save();
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                    ctx.shadowBlur = 5;
-                    ctx.shadowOffsetY = 2;
-                    ctx.beginPath();
-                    ctx.arc(objX, Math.min(objY, canvas.height - 122), 10, 0, 2 * Math.PI);
-                    ctx.fill();
-                    ctx.restore();
-                }
+            // Objects - support multiple objects (also show before starting)
+            if (running || dropObjects.length > 0) {
+                dropObjects.forEach((obj, index) => {
+                    const objectCount = dropObjects.length;
+                    const baseX = canvas.width / 2;
+                    let objX;
 
-                // Speed label
-                if (running) {
-                    ctx.save();
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                    ctx.shadowBlur = 2;
-                    ctx.shadowOffsetX = 1;
-                    ctx.shadowOffsetY = 1;
-                    ctx.font = '16px system-ui';
-                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                    const speedText = `${v.toFixed(1)} m/s`;
-                    ctx.fillText(speedText, objX + 20, objY + 5);
-                    ctx.restore();
-                }
+                    if (objectCount === 1) {
+                        objX = baseX;
+                    } else {
+                        // Position objects side by side for comparison
+                        const spacing = 80;
+                        objX = baseX + (index - (objectCount - 1) / 2) * spacing;
+                    }
+
+                    // Show objects at starting position if not started, otherwise follow physics
+                    let objY;
+                    if (!running && obj.t === 0) {
+                        objY = 30; // At the top of the building
+                    } else {
+                        objY = Math.min(30 + (obj.s / obj.h) * (canvas.height - 180), canvas.height - 122);
+                    }
+
+                    ctx.fillStyle = obj.color || '#B87333';
+
+                    if (obj.shape === 'feather') {
+                        drawFeather(objX, objY);
+                    } else if (obj.shape === 'hammer') {
+                        drawHammer(objX, objY);
+                    } else {
+                        drawCircle(objX, objY, obj);
+                    }
+
+                    // Speed label for running simulations
+                    if (running && obj.s < obj.h) {
+                        ctx.save();
+                        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                        ctx.shadowBlur = 2;
+                        ctx.shadowOffsetX = 1;
+                        ctx.shadowOffsetY = 1;
+                        ctx.font = '14px system-ui';
+                        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                        const speedText = `${obj.v.toFixed(1)} m/s`;
+                        ctx.fillText(speedText, objX + 20, objY + 5);
+                        ctx.restore();
+                    }
+                });
             }
 
             // Particles on impact
@@ -980,9 +1086,51 @@
                 particles = particles.filter(p => p.life > 0);
             }
 
-            if (!running && t >= t_impact && personAnimFrame < 20) {
+            if (!running && dropObjects.length > 0 && dropObjects.some(obj => obj.t >= obj.t_impact) && personAnimFrame < 20) {
                 personAnimFrame += 0.3;
             }
+        }
+
+        function drawFeather(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(Math.PI / 4);
+            ctx.beginPath();
+            ctx.moveTo(0, -15);
+            ctx.lineTo(0, 15);
+            ctx.strokeStyle = '#DDD';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            for (let i = -10; i <= 10; i += 5) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(8, i - 4);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawHammer(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            // Draw hammer handle
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(-2, -10, 4, 20);
+            // Draw hammer head
+            ctx.fillStyle = '#C0C0C0';
+            ctx.fillRect(-8, -12, 16, 8);
+            ctx.restore();
+        }
+
+        function drawCircle(x, y, obj) {
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 5;
+            ctx.shadowOffsetY = 2;
+            ctx.beginPath();
+            ctx.arc(x, Math.min(y, canvas.height - 122), 10, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
         }
 
         function drawPerson(x, y, animate) {
@@ -1102,8 +1250,22 @@
                 return;
             }
 
+            // Get environment settings
+            const envType = document.getElementById('environment').value;
+            if (envType === 'custom-env') {
+                g = parseFloat(document.getElementById('custom-gravity').value);
+                airResistanceFactor = parseFloat(document.getElementById('air-resistance').value);
+            } else {
+                const env = environments[envType];
+                g = env.gravity;
+                airResistanceFactor = env.airResistance;
+            }
+
+            // Get simulation mode
+            simulationMode = document.getElementById('simulation-mode').value;
+
             // If we have existing data, continue from where we left off
-            if (t > 0 && s < h) {
+            if (dropObjects.length > 0 && dropObjects[0].t > 0 && dropObjects[0].s < dropObjects[0].h) {
                 running = true;
                 document.getElementById('start').textContent = 'Stop Simulation';
                 document.getElementById('start').className = 'btn btn-danger';
@@ -1111,56 +1273,35 @@
                 return;
             }
 
-            // Start new simulation
-            const objType = document.getElementById('object').value;
-            let selectedObj;
-            if (objType === 'custom') {
-                mass = parseFloat(document.getElementById('mass').value);
-                terminalV = parseFloat(document.getElementById('terminalV').value);
-                objColor = '#333333';
-                objShape = 'circle';
-            } else {
-                selectedObj = objects[objType];
-                mass = selectedObj.mass;
-                terminalV = selectedObj.terminalV;
-                objColor = selectedObj.color;
-                objShape = selectedObj.shape;
+            // Start new simulation - initialize objects based on mode
+            dropObjects = [];
+            const h = parseFloat(document.getElementById('height').value);
+
+            if (simulationMode === 'single') {
+                const objType = document.getElementById('object').value;
+                const obj = createDropObject(objType, h, 0);
+                if (obj) dropObjects.push(obj);
+            } else if (simulationMode === 'dual') {
+                const obj1Type = document.getElementById('object1').value;
+                const obj2Type = document.getElementById('object2').value;
+                const obj1 = createDropObject(obj1Type, h, 0);
+                const obj2 = createDropObject(obj2Type, h, 1);
+                if (obj1 && obj2) {
+                    dropObjects.push(obj1, obj2);
+                }
             }
-            h = parseFloat(document.getElementById('height').value);
-            if (isNaN(mass) || isNaN(terminalV) || mass <= 0 || terminalV <= 0 || h <= 0) {
-                alert('Invalid inputs. Height must be greater than 0.');
+
+            if (dropObjects.length === 0) {
+                alert('Invalid inputs. Please check your settings.');
                 return;
             }
 
-            t_term = terminalV / g;
-            s_term = (terminalV ** 2) / (2 * g);
-            if (h <= s_term) {
-                t_impact = Math.sqrt(2 * h / g);
-                v_impact = Math.sqrt(2 * g * h);
-            } else {
-                t_impact = t_term + (h - s_term) / terminalV;
-                v_impact = terminalV;
-            }
-            ke = 0.5 * mass * (v_impact ** 2);
-            reached_terminal = h > s_term;
-
-            outcome = outcomes.find(o => ke >= o.min && ke < o.max);
-            personAnimLevel = outcomes.indexOf(outcome);
+            // Initialize charts with datasets for each object
+            updateChartsForObjects();
 
             running = true;
-            t = 0;
-            s = 0;
-            v = 0;
-            a = g; // Initial acceleration is g
-            vtData = [{ x: 0, y: 0 }]; // Start with initial point at t=0
-            stData = [{ x: 0, y: 0 }];
-            htData = [{ x: 0, y: h }]; // Start at full height
-            atData = [{ x: 0, y: g }];
             particles = [];
             personAnimFrame = 0;
-
-            // Set fixed y-axis for height chart
-            htChart.options.scales.y.max = h;
 
             document.getElementById('start').textContent = 'Stop Simulation';
             document.getElementById('start').className = 'btn btn-danger';
@@ -1171,7 +1312,163 @@
             document.getElementById('height-input').disabled = true;
             document.getElementById('verdict').style.display = 'none';
             lastTime = performance.now();
-            lastPushTime = 0;
+        }
+
+        function createDropObject(objType, h, index) {
+            let selectedObj, mass, terminalV, objColor, objShape;
+
+            if (objType === 'custom') {
+                mass = parseFloat(document.getElementById('mass').value);
+                terminalV = parseFloat(document.getElementById('terminalV').value);
+                objColor = '#333333';
+                objShape = 'circle';
+            } else {
+                selectedObj = objects[objType];
+                if (!selectedObj) return null;
+                mass = selectedObj.mass;
+                // In vacuum (airResistanceFactor = 0), there is NO terminal velocity
+                if (airResistanceFactor === 0) {
+                    terminalV = Infinity; // No terminal velocity in vacuum
+                } else {
+                    terminalV = selectedObj.terminalV;
+                }
+                objColor = selectedObj.color;
+                objShape = selectedObj.shape;
+            }
+
+            if (isNaN(mass) || mass <= 0 || h <= 0 || (terminalV <= 0 && terminalV !== Infinity)) {
+                return null;
+            }
+
+            // Calculate physics parameters for this object
+            const t_term = terminalV === Infinity ? Infinity : terminalV / g;
+            const s_term = terminalV === Infinity ? Infinity : (terminalV ** 2) / (2 * g);
+            let t_impact, v_impact;
+
+            if (h <= s_term || airResistanceFactor === 0 || terminalV === Infinity) {
+                // Object doesn't reach terminal velocity or no air resistance
+                t_impact = Math.sqrt(2 * h / g);
+                v_impact = Math.sqrt(2 * g * h);
+            } else {
+                // Object reaches terminal velocity
+                t_impact = t_term + (h - s_term) / terminalV;
+                v_impact = terminalV;
+            }
+
+            const ke = 0.5 * mass * (v_impact ** 2);
+            const reached_terminal = h > s_term && airResistanceFactor > 0 && terminalV !== Infinity;
+            const outcome = outcomes.find(o => ke >= o.min && ke < o.max);
+
+            // Initialize objects with default properties
+            return {
+                name: objType,
+                mass: mass,
+                terminalV: terminalV,
+                color: objColor,
+                shape: objShape,
+                h: h,
+                t: 0,
+                s: 0,
+                v: 0,
+                a: g,
+                t_term: t_term,
+                s_term: s_term,
+                t_impact: t_impact,
+                v_impact: v_impact,
+                ke: ke,
+                reached_terminal: reached_terminal,
+                outcome: outcome,
+                lastPushTime: 0,
+                index: index,
+                hasLanded: false,
+                verdictShown: false
+            };
+        }
+
+        function updateChartsForObjects() {
+            // Clear existing datasets
+            vtChart.data.datasets = [];
+            stChart.data.datasets = [];
+            htChart.data.datasets = [];
+            atChart.data.datasets = [];
+
+            const colors = ['#2196F3', '#4CAF50', '#FF9F0A', '#F44336', '#9C27B0'];
+
+            // Enable legend for multiple objects
+            const showLegend = dropObjects.length > 1;
+            vtChart.options.plugins.legend.display = showLegend;
+            stChart.options.plugins.legend.display = showLegend;
+            htChart.options.plugins.legend.display = showLegend;
+            atChart.options.plugins.legend.display = showLegend;
+
+            dropObjects.forEach((obj, index) => {
+                const color = colors[index % colors.length];
+                const label = simulationMode === 'single' ? obj.name : `${obj.name} (${index + 1})`;
+
+                // Initialize data arrays
+                chartData.velocity[index] = [{ x: 0, y: 0 }];
+                chartData.distance[index] = [{ x: 0, y: 0 }];
+                chartData.height[index] = [{ x: 0, y: obj.h }];
+                chartData.acceleration[index] = [{ x: 0, y: g }];
+
+                // Create datasets
+                vtChart.data.datasets.push({
+                    label: label,
+                    data: chartData.velocity[index],
+                    borderColor: color,
+                    backgroundColor: color + '20',
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                });
+
+                stChart.data.datasets.push({
+                    label: label,
+                    data: chartData.distance[index],
+                    borderColor: color,
+                    backgroundColor: color + '20',
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                });
+
+                htChart.data.datasets.push({
+                    label: label,
+                    data: chartData.height[index],
+                    borderColor: color,
+                    backgroundColor: color + '20',
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                });
+
+                atChart.data.datasets.push({
+                    label: label,
+                    data: chartData.acceleration[index],
+                    borderColor: color,
+                    backgroundColor: color + '20',
+                    fill: false,
+                    tension: 0.2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 3
+                });
+            });
+
+            // Set height chart max
+            htChart.options.scales.y.max = dropObjects[0].h;
+
+            // Update all charts
+            vtChart.update();
+            stChart.update();
+            htChart.update();
+            atChart.update();
         }
 
         function resetDrop() {
@@ -1184,22 +1481,43 @@
             document.getElementById('height').disabled = false;
             document.getElementById('height-input').disabled = false;
             document.getElementById('verdict').style.display = 'none';
-            t = 0;
-            vtData = [];
-            stData = [];
-            htData = [];
-            atData = [];
+            document.getElementById('dual-results').style.display = 'none';
+
+            dropObjects = [];
+            chartData = {
+                velocity: [],
+                distance: [],
+                height: [],
+                acceleration: []
+            };
+
+            // Clear all chart datasets
+            vtChart.data.datasets = [];
+            stChart.data.datasets = [];
+            htChart.data.datasets = [];
+            atChart.data.datasets = [];
+
             vtChart.options.scales.x.max = undefined;
             stChart.options.scales.x.max = undefined;
             htChart.options.scales.x.max = undefined;
             htChart.options.scales.y.max = undefined;
             atChart.options.scales.x.max = undefined;
+
             vtChart.update();
             stChart.update();
             htChart.update();
             atChart.update();
+
             particles = [];
             personAnimFrame = 0;
+
+            // Reinitialize with default object
+            const h = parseFloat(document.getElementById('height').value) || 100;
+            const defaultObj = createDropObject('penny', h, 0);
+            if (defaultObj) {
+                dropObjects = [defaultObj];
+                updateChartsForObjects();
+            }
         }
 
         function animate(time) {
@@ -1215,42 +1533,82 @@
                 }
             });
 
-            if (running) {
-                t += dt;
+            if (running && dropObjects.length > 0) {
+                let allObjectsLanded = true;
 
-                if (t <= t_term) {
-                    v = g * t;
-                    s = 0.5 * g * (t ** 2);
-                    a = g;
-                } else {
-                    v = terminalV;
-                    s = s_term + terminalV * (t - t_term);
-                    a = 0;
-                }
+                dropObjects.forEach((obj, objIndex) => {
+                    obj.t += dt;
 
-                if (t - lastPushTime >= 0.05) {  // Downsample to every 0.05s
-                    vtData.push({ x: t, y: v });
-                    stData.push({ x: t, y: s });
-                    htData.push({ x: t, y: h - s }); // Height above ground decreases as distance increases
-                    atData.push({ x: t, y: a });
-                    lastPushTime = t;
-                }
+                    // Calculate physics for this object
+                    if (obj.t <= obj.t_term && airResistanceFactor > 0 && obj.terminalV !== Infinity) {
+                        // Accelerating phase
+                        obj.v = g * obj.t;
+                        obj.s = 0.5 * g * (obj.t ** 2);
+                        obj.a = g;
+                    } else {
+                        // Terminal velocity phase or vacuum
+                        if (airResistanceFactor === 0 || obj.terminalV === Infinity) {
+                            // In vacuum, continue accelerating
+                            obj.v = g * obj.t;
+                            obj.s = 0.5 * g * (obj.t ** 2);
+                            obj.a = g;
+                        } else {
+                            // Terminal velocity reached
+                            obj.v = obj.terminalV;
+                            obj.s = obj.s_term + obj.terminalV * (obj.t - obj.t_term);
+                            obj.a = 0;
+                        }
+                    }
 
-                vtChart.data.datasets[0].data = vtData;
-                stChart.data.datasets[0].data = stData;
-                htChart.data.datasets[0].data = htData;
-                atChart.data.datasets[0].data = atData;
+                    // Check if this object has just landed
+                    if (obj.s >= obj.h && !obj.hasLanded) {
+                        obj.hasLanded = true;
+                        obj.s = obj.h; // Cap at ground level
+                        obj.landingTime = obj.t; // Record when it landed
+                    }
+
+                    if (obj.s < obj.h) {
+                        allObjectsLanded = false;
+                    }
+
+                    // Update chart data every 0.05 seconds
+                    if (obj.t - obj.lastPushTime >= 0.05 && obj.s <= obj.h) {
+                        chartData.velocity[objIndex].push({ x: obj.t, y: obj.v });
+                        chartData.distance[objIndex].push({ x: obj.t, y: obj.s });
+                        chartData.height[objIndex].push({ x: obj.t, y: obj.h - obj.s });
+                        chartData.acceleration[objIndex].push({ x: obj.t, y: obj.a });
+                        obj.lastPushTime = obj.t;
+                    }
+                });
+
+                // Update all charts
+                vtChart.data.datasets.forEach((dataset, index) => {
+                    dataset.data = chartData.velocity[index] || [];
+                });
+                stChart.data.datasets.forEach((dataset, index) => {
+                    dataset.data = chartData.distance[index] || [];
+                });
+                htChart.data.datasets.forEach((dataset, index) => {
+                    dataset.data = chartData.height[index] || [];
+                });
+                atChart.data.datasets.forEach((dataset, index) => {
+                    dataset.data = chartData.acceleration[index] || [];
+                });
+
                 vtChart.update('none');
                 stChart.update('none');
                 htChart.update('none');
                 atChart.update('none');
 
-                if (s >= h) {
+                // Check if all objects have landed
+                if (allObjectsLanded) {
                     running = false;
                     document.getElementById('start').textContent = 'Start Simulation';
                     document.getElementById('start').className = 'btn btn-success';
-                    // Only show particles for harmless or minor impacts (ke < 50J)
-                    if (ke < 50) {
+
+                    // Create particles for harmless impacts only
+                    const harmlessImpacts = dropObjects.filter(obj => obj.ke < 50);
+                    if (harmlessImpacts.length > 0) {
                         for (let i = 0; i < 40; i++) {
                             particles.push({
                                 x: canvas.width / 2,
@@ -1262,82 +1620,41 @@
                         }
                     }
 
-                    // Delay verdict screen to show animation
-                    setTimeout(() => {
-                        document.getElementById('verdict-text').textContent = `${outcome.text} (${ke.toFixed(1)} J)`;
-                        document.getElementById('verdict-text').style.color = outcome.color;
+                    // Determine the worst outcome for animation
+                    const worstOutcome = dropObjects.reduce((worst, obj) => {
+                        return obj.ke > worst.ke ? obj : worst;
+                    }, dropObjects[0]);
 
-                        // Create clean, Apple-inspired calculation display
-                        const cleanCalculation = `
-                            <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;">
+                    personAnimLevel = outcomes.indexOf(worstOutcome.outcome);
 
-                                <div style="background: rgba(0, 122, 255, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(0, 122, 255, 0.2);">
-                                    <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #007AFF; letter-spacing: -0.3px;">Parameters</div>
+                    // For dual mode, show simple notification first, then detailed verdict
+                    if (simulationMode === 'dual') {
+                        // Check if objects landed at nearly the same time (within 0.05 seconds for very close)
+                        const landingTimes = dropObjects.map(obj => obj.landingTime).sort();
+                        const timeDiff = landingTimes[landingTimes.length - 1] - landingTimes[0];
+                        const simultaneous = timeDiff < 0.05; // Much tighter tolerance
 
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 15px; color: #1d1d1f;">
-                                        <div style="text-align: left;">
-                                            <div style="color: #007AFF; font-weight: 600; margin-bottom: 12px; font-size: 17px; letter-spacing: -0.2px;">Object</div>
-                                            <div style="margin-bottom: 8px; font-weight: 400;">Height: <span style="font-weight: 600;">${h} m</span></div>
-                                            <div style="margin-bottom: 8px; font-weight: 400;">Mass: <span style="font-weight: 600;">${mass.toFixed(3)} kg</span></div>
-                                            <div style="font-weight: 400;">Terminal velocity: <span style="color: #FF9F0A; font-weight: 600;">${terminalV} m/s</span></div>
-                                        </div>
-                                        <div style="text-align: left;">
-                                            <div style="color: #30D158; font-weight: 600; margin-bottom: 12px; font-size: 17px; letter-spacing: -0.2px;">Results</div>
-                                            <div style="margin-bottom: 8px; font-weight: 400;">Fall time: <span style="font-weight: 600;">${t_impact.toFixed(3)} s</span></div>
-                                            <div style="margin-bottom: 8px; font-weight: 400;">Terminal reached: <span style="color: ${reached_terminal ? '#30D158' : '#FF3B30'}; font-weight: 600;">${reached_terminal ? 'Yes' : 'No'}</span></div>
-                                            <div style="font-weight: 400;">Impact speed: <span style="color: #FF3B30; font-weight: 600;">${v_impact.toFixed(3)} m/s</span></div>
-                                        </div>
-                                    </div>
-                                </div>
+                        if (simultaneous) {
+                            showSimpleNotification("Objects landed simultaneously!");
+                        } else {
+                            const first = dropObjects.reduce((earliest, obj) =>
+                                obj.landingTime < earliest.landingTime ? obj : earliest, dropObjects[0]);
+                            const second = dropObjects.reduce((latest, obj) =>
+                                obj.landingTime > latest.landingTime ? obj : latest, dropObjects[0]);
 
-                                <div style="background: rgba(48, 209, 88, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(48, 209, 88, 0.2);">
-                                    <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #30D158; letter-spacing: -0.3px;">Impact Velocity</div>
+                            const displayName = first.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            showSimpleNotification(`${displayName} landed first! (${(second.landingTime - first.landingTime).toFixed(2)}s difference)`);
+                        }
 
-                                    ${reached_terminal ?
-                                        `<div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
-                                            <span style="color: #007AFF; font-weight: 600;">v</span><sub style="font-size: 16px;">impact</sub> = <span style="color: #FF9F0A; font-weight: 600;">terminal velocity</span>
-                                        </div>
-                                        <div style="font-size: 28px; color: #30D158; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
-                                            ${v_impact.toFixed(3)} m/s
-                                        </div>`
-                                        :
-                                        `<div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
-                                            <span style="color: #007AFF; font-weight: 600;">v</span> = √(<span style="color: #FF3B30; font-weight: 600;">2</span><span style="color: #30D158; font-weight: 600;">g</span><span style="color: #FF9F0A; font-weight: 600;">h</span>)
-                                        </div>
-                                        <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
-                                            √(<span style="color: #FF3B30; font-weight: 600;">2</span> × <span style="color: #30D158; font-weight: 600;">9.8 m/s²</span> × <span style="color: #FF9F0A; font-weight: 600;">${h} m</span>) = <span style="color: #007AFF; font-weight: 600;">${v_impact.toFixed(3)} m/s</span>
-                                        </div>
-                                        <div style="font-size: 28px; color: #30D158; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
-                                            ${v_impact.toFixed(3)} m/s
-                                        </div>`
-                                    }
-                                </div>
-
-                                <div style="background: rgba(255, 159, 10, 0.08); border-radius: 16px; padding: 24px; margin: 0px 0; border: 1px solid rgba(255, 159, 10, 0.2);">
-                                    <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #FF9F0A; letter-spacing: -0.3px;">Kinetic Energy</div>
-
-                                    <div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
-                                        <span style="color: #007AFF; font-weight: 600;">KE</span> = <span style="color: #FF3B30; font-weight: 600;">½</span><span style="color: #30D158; font-weight: 600;">m</span><span style="color: #007AFF; font-weight: 600;">v</span><span style="color: #1d1d1f;">²</span>
-                                    </div>
-
-                                    <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
-                                        <span style="color: #FF3B30; font-weight: 600;">0.5</span> × <span style="color: #30D158; font-weight: 600;">${mass.toFixed(4)} kg</span> × (<span style="color: #007AFF; font-weight: 600;">${v_impact.toFixed(3)} m/s</span>)² = <span style="color: #FF9F0A; font-weight: 600;">${ke.toFixed(3)} J</span>
-                                    </div>
-
-                                    <div style="font-size: 28px; color: #FF9F0A; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
-                                        ${ke.toFixed(3)} J
-                                    </div>
-
-                                    <div style="font-size: 13px; color: #86868b; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(134, 134, 139, 0.2); font-weight: 400;">
-                                        Reference: Human skull fracture threshold ≈ 68 J<br>
-                                        <span style="font-size: 11px; opacity: 0.8;">Yoganandan, N et al. "Biomechanics of skull fracture." Journal of neurotrauma vol. 12,4 (1995): 659-68. doi:10.1089/neu.1995.12.659</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        document.getElementById('stats').innerHTML = cleanCalculation;
-                        document.getElementById('verdict').style.display = 'block';
-                    }, 500); // 0.5 second delay to show animation
+                        setTimeout(() => {
+                            showVerdict(); // Show detailed verdict after notification
+                        }, 1500);
+                    } else {
+                        // Single mode
+                        setTimeout(() => {
+                            showVerdict();
+                        }, 500);
+                    }
                 }
             }
 
@@ -1345,26 +1662,260 @@
             requestAnimationFrame(animate);
         }
 
+        function showSimpleNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 12px;
+                font-size: 18px;
+                font-weight: 600;
+                z-index: 3000;
+                animation: fadeInOut 1.5s ease-in-out;
+            `;
+
+            notification.textContent = message;
+
+            // Add animation if not already added
+            if (!document.getElementById('simple-notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'simple-notification-styles';
+                style.textContent = `
+                    @keyframes fadeInOut {
+                        0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                        50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 1500);
+        }
+
+
+        function showVerdict() {
+            if (simulationMode === 'dual' && dropObjects.length > 1) {
+                // For dual mode, show professional verdict similar to single mode but for multiple objects
+                const envElement = document.getElementById('environment');
+                const envName = envElement ? envElement.selectedOptions[0].text : 'Earth';
+
+                let verdictHTML = `
+                    <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;">
+                        <div style="background: rgba(0, 122, 255, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(0, 122, 255, 0.2);">
+                            <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #007AFF; letter-spacing: -0.3px;">Environment</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 15px; color: #1d1d1f;">
+                                <div style="text-align: left;">
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Location: <span style="font-weight: 600;">${envName}</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Height: <span style="font-weight: 600;">${dropObjects[0].h} m</span></div>
+                                </div>
+                                <div style="text-align: left;">
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Gravity: <span style="font-weight: 600;">${g} m/s²</span></div>
+                                    <div style="font-weight: 400;">Air Resistance: <span style="font-weight: 600;">${airResistanceFactor === 0 ? 'None (Vacuum)' : airResistanceFactor === 1 ? 'Earth Normal' : airResistanceFactor.toFixed(1) + 'x Earth'}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                `;
+
+                // Add results for each object
+                dropObjects.forEach((obj, index) => {
+                    const displayName = obj.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    verdictHTML += `
+                        <div style="background: rgba(${index === 0 ? '48, 209, 88' : '255, 159, 10'}, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(${index === 0 ? '48, 209, 88' : '255, 159, 10'}, 0.2);">
+                            <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: ${index === 0 ? '#30D158' : '#FF9F0A'}; letter-spacing: -0.3px;">${displayName} Results</div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 15px; color: #1d1d1f; margin-bottom: 20px;">
+                                <div style="text-align: left;">
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Mass: <span style="font-weight: 600;">${obj.mass.toFixed(3)} kg</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Impact Speed: <span style="font-weight: 600;">${obj.v_impact.toFixed(2)} m/s</span></div>
+                                </div>
+                                <div style="text-align: left;">
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Fall Time: <span style="font-weight: 600;">${obj.t_impact.toFixed(3)} s</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Kinetic Energy: <span style="font-weight: 600;">${obj.ke.toFixed(2)} J</span></div>
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; padding: 12px; border-radius: 8px; background: ${obj.outcome.color}20; color: ${obj.outcome.color}; font-weight: 600; font-size: 16px;">
+                                ${obj.outcome.text}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Add comparison summary
+                const worst = dropObjects.reduce((w, obj) => obj.ke > w.ke ? obj : w, dropObjects[0]);
+                const worstDisplayName = worst.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                verdictHTML += `
+                    <div style="background: rgba(255, 59, 48, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(255, 59, 48, 0.2);">
+                        <div style="font-size: 19px; font-weight: 600; margin-bottom: 12px; color: #FF3B30; letter-spacing: -0.3px;">Most Dangerous Impact</div>
+                        <div style="font-size: 22px; color: ${worst.outcome.color}; font-weight: 700; margin: 16px 0;">${worstDisplayName} - ${worst.ke.toFixed(1)} J</div>
+                        <div style="font-size: 13px; color: #86868b; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(134, 134, 139, 0.2); font-weight: 400;">
+                            Reference: Human skull fracture threshold ≈ 68 J<br>
+                            <span style="font-size: 11px; opacity: 0.8;">Yoganandan, N et al. "Biomechanics of skull fracture." Journal of neurotrauma vol. 12,4 (1995): 659-68.</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                document.getElementById('verdict-text').textContent = `Comparison Results (${worst.ke.toFixed(1)} J worst)`;
+                document.getElementById('verdict-text').style.color = worst.outcome.color;
+                document.getElementById('stats').innerHTML = verdictHTML;
+            } else {
+                // Single object verdict with detailed formulas for any gravity
+                const obj = dropObjects[0];
+                document.getElementById('verdict-text').textContent = `${obj.outcome.text} (${obj.ke.toFixed(1)} J)`;
+                document.getElementById('verdict-text').style.color = obj.outcome.color;
+
+                const envElement = document.getElementById('environment');
+                const envName = envElement ? envElement.selectedOptions[0].text : 'Earth';
+
+                const cleanCalculation = `
+                    <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;">
+                        <div style="background: rgba(0, 122, 255, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(0, 122, 255, 0.2);">
+                            <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #007AFF; letter-spacing: -0.3px;">Parameters</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 15px; color: #1d1d1f;">
+                                <div style="text-align: left;">
+                                    <div style="color: #007AFF; font-weight: 600; margin-bottom: 12px; font-size: 17px; letter-spacing: -0.2px;">Environment</div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Location: <span style="font-weight: 600;">${envName}</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Height: <span style="font-weight: 600;">${obj.h} m</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Gravity: <span style="font-weight: 600;">${g} m/s²</span></div>
+                                    <div style="font-weight: 400;">Air Resistance: <span style="font-weight: 600;">${airResistanceFactor === 0 ? 'None (Vacuum)' : airResistanceFactor === 1 ? 'Earth Normal' : airResistanceFactor.toFixed(1) + 'x Earth'}</span></div>
+                                </div>
+                                <div style="text-align: left;">
+                                    <div style="color: #30D158; font-weight: 600; margin-bottom: 12px; font-size: 17px; letter-spacing: -0.2px;">Object</div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Mass: <span style="font-weight: 600;">${obj.mass.toFixed(3)} kg</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Terminal velocity: <span style="color: #FF9F0A; font-weight: 600;">${obj.terminalV === Infinity ? '∞ (vacuum)' : obj.terminalV.toFixed(1) + ' m/s'}</span></div>
+                                    <div style="margin-bottom: 8px; font-weight: 400;">Fall time: <span style="font-weight: 600;">${obj.t_impact.toFixed(3)} s</span></div>
+                                    <div style="font-weight: 400;">Terminal reached: <span style="color: ${obj.reached_terminal ? '#30D158' : '#FF3B30'}; font-weight: 600;">${obj.reached_terminal ? 'Yes' : 'No'}</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(48, 209, 88, 0.08); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(48, 209, 88, 0.2);">
+                            <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #30D158; letter-spacing: -0.3px;">Impact Velocity Calculation</div>
+
+                            ${obj.reached_terminal ?
+                                `<div style="font-size: 18px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
+                                    Object reached terminal velocity due to air resistance
+                                </div>
+                                <div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
+                                    <span style="color: #007AFF; font-weight: 600;">v</span><sub style="font-size: 16px;">impact</sub> = <span style="color: #FF9F0A; font-weight: 600;">terminal velocity</span>
+                                </div>
+                                <div style="font-size: 28px; color: #30D158; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
+                                    ${obj.v_impact.toFixed(2)} m/s
+                                </div>`
+                                :
+                                `<div style="font-size: 18px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
+                                    Using free fall formula (no air resistance or terminal velocity not reached):
+                                </div>
+                                <div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
+                                    <span style="color: #007AFF; font-weight: 600;">v</span> = √(<span style="color: #FF3B30; font-weight: 600;">2</span> × <span style="color: #30D158; font-weight: 600;">gravity</span> × <span style="color: #FF9F0A; font-weight: 600;">height</span>)
+                                </div>
+                                <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
+                                    v = √(<span style="color: #FF3B30; font-weight: 600;">2</span> × <span style="color: #30D158; font-weight: 600;">${g} m/s²</span> × <span style="color: #FF9F0A; font-weight: 600;">${obj.h} m</span>)
+                                </div>
+                                <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
+                                    v = √<span style="color: #007AFF; font-weight: 600;">${(2 * g * obj.h).toFixed(1)}</span> = <span style="color: #30D158; font-weight: 600;">${obj.v_impact.toFixed(2)} m/s</span>
+                                </div>
+                                <div style="font-size: 28px; color: #30D158; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
+                                    ${obj.v_impact.toFixed(2)} m/s
+                                </div>`
+                            }
+                        </div>
+
+                        <div style="background: rgba(255, 159, 10, 0.08); border-radius: 16px; padding: 24px; margin: 0px 0; border: 1px solid rgba(255, 159, 10, 0.2);">
+                            <div style="font-size: 19px; font-weight: 600; margin-bottom: 20px; color: #FF9F0A; letter-spacing: -0.3px;">Kinetic Energy Calculation</div>
+
+                            <div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
+                                <span style="color: #007AFF; font-weight: 600;">KE</span> = <span style="color: #FF3B30; font-weight: 600;">½</span> × <span style="color: #30D158; font-weight: 600;">mass</span> × <span style="color: #007AFF; font-weight: 600;">velocity</span><span style="color: #1d1d1f;">²</span>
+                            </div>
+
+                            <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
+                                KE = <span style="color: #FF3B30; font-weight: 600;">0.5</span> × <span style="color: #30D158; font-weight: 600;">${obj.mass.toFixed(4)} kg</span> × (<span style="color: #007AFF; font-weight: 600;">${obj.v_impact.toFixed(2)} m/s</span>)²
+                            </div>
+
+                            <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
+                                KE = <span style="color: #FF3B30; font-weight: 600;">0.5</span> × <span style="color: #30D158; font-weight: 600;">${obj.mass.toFixed(4)}</span> × <span style="color: #007AFF; font-weight: 600;">${(obj.v_impact ** 2).toFixed(1)}</span> = <span style="color: #FF9F0A; font-weight: 600;">${obj.ke.toFixed(3)} J</span>
+                            </div>
+
+                            <div style="font-size: 28px; color: #FF9F0A; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
+                                ${obj.ke.toFixed(2)} J
+                            </div>
+
+                            <div style="font-size: 13px; color: #86868b; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(134, 134, 139, 0.2); font-weight: 400;">
+                                Reference: Human skull fracture threshold ≈ 68 J<br>
+                                <span style="font-size: 11px; opacity: 0.8;">Yoganandan, N et al. "Biomechanics of skull fracture." Journal of neurotrauma vol. 12,4 (1995): 659-68. doi:10.1089/neu.1995.12.659</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('stats').innerHTML = cleanCalculation;
+            }
+            document.getElementById('verdict').style.display = 'block';
+        }
+
         // Event listeners
         window.addEventListener('resize', () => {
             resizeCanvas();
             drawScene();
         });
+
+        // Simulation mode change
+        document.getElementById('simulation-mode').addEventListener('change', (e) => {
+            const mode = e.target.value;
+            document.getElementById('single-object-controls').style.display = mode === 'single' ? 'block' : 'none';
+            document.getElementById('dual-object-controls').style.display = mode === 'dual' ? 'block' : 'none';
+        });
+
+        // Environment change
+        document.getElementById('environment').addEventListener('change', (e) => {
+            const isCustom = e.target.value === 'custom-env';
+            document.getElementById('custom-env-inputs').style.display = isCustom ? 'block' : 'none';
+        });
+
+        // Air resistance slider
+        document.getElementById('air-resistance').addEventListener('input', (e) => {
+            document.getElementById('air-resistance-value').textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
         document.getElementById('object').addEventListener('change', (e) => {
             const custom = e.target.value === 'custom';
             document.getElementById('custom-inputs').style.display = custom ? 'block' : 'none';
         });
+
         document.getElementById('height').addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById('height-input').value = value;
         });
+
         document.getElementById('height-input').addEventListener('input', (e) => {
             const value = Math.max(0, Math.min(400, parseFloat(e.target.value) || 0));
             e.target.value = value;
             document.getElementById('height').value = value;
         });
+
         document.getElementById('start').addEventListener('click', startDrop);
         document.getElementById('reset').addEventListener('click', resetDrop);
+
+        // Initialize with a default object on page load
+        window.addEventListener('load', () => {
+            const h = parseFloat(document.getElementById('height').value) || 100;
+            const defaultObj = createDropObject('penny', h, 0);
+            if (defaultObj) {
+                dropObjects = [defaultObj];
+                updateChartsForObjects();
+            }
+        });
 
         // Init
         resizeCanvas();
