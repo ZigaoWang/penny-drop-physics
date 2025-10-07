@@ -735,6 +735,7 @@
                 options: chartOptions
             });
             htChart.options.scales.y.title.text = 'h (m)';
+            htChart.options.scales.y.min = 0;
             atChart = new Chart(document.getElementById('at-chart'), {
                 type: 'line',
                 data: { datasets: [{
@@ -1157,6 +1158,10 @@
             atData = [{ x: 0, y: g }];
             particles = [];
             personAnimFrame = 0;
+
+            // Set fixed y-axis for height chart
+            htChart.options.scales.y.max = h;
+
             document.getElementById('start').textContent = 'Stop Simulation';
             document.getElementById('start').className = 'btn btn-danger';
             document.getElementById('start').disabled = false;
@@ -1187,6 +1192,7 @@
             vtChart.options.scales.x.max = undefined;
             stChart.options.scales.x.max = undefined;
             htChart.options.scales.x.max = undefined;
+            htChart.options.scales.y.max = undefined;
             atChart.options.scales.x.max = undefined;
             vtChart.update();
             stChart.update();
