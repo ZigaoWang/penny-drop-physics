@@ -423,7 +423,48 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 1200px) {
+        @media (max-width: 900px) {
+            #container {
+                grid-template-columns: 250px 1fr;
+                grid-template-rows: auto 1fr auto;
+                grid-template-areas:
+                    "controls controls"
+                    "scene graphs"
+                    "footer footer";
+                gap: 8px;
+            }
+
+            #controls {
+                width: auto;
+                margin: 8px;
+                padding: 16px;
+                grid-area: controls;
+            }
+
+            #graphs {
+                width: auto;
+                margin: 8px;
+                padding: 16px;
+                grid-area: graphs;
+                max-width: 300px;
+                max-height: calc(100vh - 200px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .chart-container {
+                flex-shrink: 0;
+                margin-bottom: 8px;
+            }
+
+            .chart-container canvas {
+                height: 150px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
             #container {
                 grid-template-columns: 1fr;
                 grid-template-rows: auto auto 1fr auto;
@@ -432,72 +473,55 @@
                     "graphs"
                     "scene"
                     "footer";
-                gap: 0;
             }
 
-            #controls {
-                width: auto;
+            #controls, #graphs {
+                margin: 8px;
+                padding: 16px;
                 max-width: none;
-                margin: 16px;
             }
 
             #graphs {
-                width: auto;
-                margin: 16px;
+                max-height: 300px;
+                overflow-y: auto;
                 flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: center;
-                max-height: none;
             }
 
             .chart-container {
                 flex: 1;
-                min-width: 280px;
-                max-width: 400px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #container {
-                grid-template-columns: 1fr;
+                min-width: 250px;
+                max-width: 350px;
             }
 
-            #controls, #graphs {
-                margin: 12px;
-                padding: 20px;
-            }
-
-            #graphs {
-                flex-direction: column;
-            }
-
-            .chart-container {
-                max-width: none;
+            .chart-container canvas {
+                height: 140px !important;
             }
 
             #verdict {
-                margin: 20px;
-                max-width: calc(100vw - 40px);
-                padding: 24px;
-                border-radius: 20px;
+                margin: 16px;
+                max-width: calc(100vw - 32px);
+                padding: 20px;
+                border-radius: 16px;
             }
 
             .text-title-1 {
-                font-size: 24px;
+                font-size: 22px;
             }
 
             .text-title-2 {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .btn {
                 font-size: 16px;
-                min-height: 48px;
+                min-height: 44px;
             }
 
             .form-control {
                 font-size: 16px;
-                padding: 14px 16px;
+                padding: 12px 16px;
             }
         }
 
@@ -514,6 +538,250 @@
             #verdict {
                 margin: 12px;
                 padding: 20px;
+            }
+        }
+
+        /* Mobile Landscape Optimization */
+        @media (orientation: landscape) and (min-width: 600px) and (max-height: 500px) {
+            #container {
+                grid-template-columns: 240px 1fr 240px;
+                grid-template-rows: 1fr auto;
+                grid-template-areas:
+                    "controls scene graphs"
+                    "footer footer footer";
+                gap: 4px;
+            }
+
+            #controls {
+                grid-area: controls;
+                width: 240px;
+                height: calc(100vh - 50px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                margin: 4px 0 4px 4px;
+                padding: 8px;
+            }
+
+            #graphs {
+                grid-area: graphs;
+                width: 240px;
+                height: calc(100vh - 50px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                margin: 4px 4px 4px 0;
+                padding: 8px;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .chart-container {
+                flex-shrink: 0;
+                margin-bottom: 6px;
+            }
+
+            .chart-container canvas {
+                height: 100px !important;
+                width: 100% !important;
+            }
+
+            .form-group {
+                margin-bottom: 8px;
+            }
+
+            .btn-group {
+                margin-top: 8px;
+                gap: 4px;
+            }
+
+            .btn {
+                min-height: 32px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .form-control {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .glass-panel {
+                border-radius: 8px;
+            }
+
+            #dual-results {
+                margin: 4px 0 4px 4px;
+                padding: 8px;
+                width: 240px;
+            }
+
+            .chart-title {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+
+            .form-label {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+        }
+
+        /* Small landscape screens warning */
+        @media (orientation: landscape) and (max-width: 699px) and (max-height: 500px) {
+            .landscape-warning {
+                position: fixed;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(255, 159, 10, 0.95);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 1000;
+                text-align: center;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
+        }
+
+        /* Very small landscape phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #container {
+                grid-template-columns: 240px 1fr 240px;
+            }
+
+            #controls, #graphs {
+                padding: 8px;
+                margin: 4px;
+            }
+
+            .chart-container canvas {
+                height: 100px !important;
+            }
+
+            .form-control {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .btn {
+                min-height: 36px;
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .form-group {
+                margin-bottom: 8px;
+            }
+        }
+
+        /* Screen size guidance */
+        .orientation-guide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 1);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .orientation-guide.show {
+            display: flex;
+        }
+
+        .orientation-content {
+            max-width: 350px;
+        }
+
+        .orientation-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .continue-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: background 0.2s;
+        }
+
+        .continue-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Show guidance for smaller screens - NO CONTINUE */
+        @media (max-width: 900px) {
+            .orientation-guide {
+                display: flex;
+            }
+
+            .continue-btn {
+                display: none !important;
+            }
+        }
+
+        /* Phone landscape ONLY - show continue option with warning */
+        @media (orientation: landscape) and (max-width: 900px) and (min-width: 500px) and (max-height: 500px) {
+            .continue-btn {
+                display: inline-block !important;
+            }
+
+            .orientation-content h2::after {
+                content: " - Not Recommended";
+                color: #FF9F0A;
+                font-size: 16px;
+            }
+        }
+
+        /* Hide guidance only for proper landscape phones */
+        @media (orientation: landscape) and (min-width: 600px) and (max-height: 500px) {
+            .orientation-guide {
+                display: none;
+            }
+        }
+
+        /* Portrait phones - stack vertically but minimize space */
+        @media (max-width: 480px) and (orientation: portrait) {
+            #container {
+                grid-template-areas:
+                    "controls"
+                    "scene"
+                    "graphs"
+                    "footer";
+            }
+
+            #controls {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+            }
+
+            #graphs {
+                max-height: 50vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .chart-container {
+                flex-shrink: 0;
+                margin-bottom: 12px;
+            }
+
+            .chart-container canvas {
+                height: 140px !important;
             }
         }
 
@@ -553,6 +821,22 @@
     </style>
 </head>
 <body>
+    <div class="orientation-guide">
+        <div class="orientation-content">
+            <div class="orientation-icon">📱</div>
+            <h2 style="margin: 0 0 16px 0; font-size: 20px;">Please Rotate to Landscape</h2>
+            <p style="margin: 0 0 16px 0; font-size: 16px;">This physics simulator works best in landscape mode on larger screens.</p>
+            <button class="continue-btn" onclick="this.parentElement.parentElement.style.display='none'">Continue Anyway</button>
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 12px; opacity: 0.7;">
+                by <a href="https://zigao.wang" target="_blank" style="color: #5AC8FA; text-decoration: none;">Zigao Wang</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="landscape-warning">
+        ⚠️ Small screen - not optimized but usable
+    </div>
+
     <canvas id="scene"></canvas>
     <div id="container">
         <div id="controls" class="glass-panel">
