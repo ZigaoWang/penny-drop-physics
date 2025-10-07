@@ -1283,9 +1283,9 @@
                                         </div>
                                         <div style="text-align: left;">
                                             <div style="color: #30D158; font-weight: 600; margin-bottom: 12px; font-size: 17px; letter-spacing: -0.2px;">Results</div>
-                                            <div style="margin-bottom: 8px; font-weight: 400;">Fall time: <span style="font-weight: 600;">${t_impact.toFixed(2)} s</span></div>
+                                            <div style="margin-bottom: 8px; font-weight: 400;">Fall time: <span style="font-weight: 600;">${t_impact.toFixed(3)} s</span></div>
                                             <div style="margin-bottom: 8px; font-weight: 400;">Terminal reached: <span style="color: ${reached_terminal ? '#30D158' : '#FF3B30'}; font-weight: 600;">${reached_terminal ? 'Yes' : 'No'}</span></div>
-                                            <div style="font-weight: 400;">Impact speed: <span style="color: #FF3B30; font-weight: 600;">${v_impact.toFixed(1)} m/s</span></div>
+                                            <div style="font-weight: 400;">Impact speed: <span style="color: #FF3B30; font-weight: 600;">${v_impact.toFixed(3)} m/s</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1298,17 +1298,17 @@
                                             <span style="color: #007AFF; font-weight: 600;">v</span><sub style="font-size: 16px;">impact</sub> = <span style="color: #FF9F0A; font-weight: 600;">terminal velocity</span>
                                         </div>
                                         <div style="font-size: 28px; color: #30D158; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
-                                            ${v_impact.toFixed(1)} m/s
+                                            ${v_impact.toFixed(3)} m/s
                                         </div>`
                                         :
                                         `<div style="font-size: 22px; margin: 16px 0; letter-spacing: -0.4px; color: #1d1d1f;">
                                             <span style="color: #007AFF; font-weight: 600;">v</span> = √(<span style="color: #FF3B30; font-weight: 600;">2</span><span style="color: #30D158; font-weight: 600;">g</span><span style="color: #FF9F0A; font-weight: 600;">h</span>)
                                         </div>
                                         <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
-                                            √(<span style="color: #FF3B30; font-weight: 600;">2</span> × <span style="color: #30D158; font-weight: 600;">9.8 m/s²</span> × <span style="color: #FF9F0A; font-weight: 600;">${h} m</span>) = <span style="color: #007AFF; font-weight: 600;">${v_impact.toFixed(1)} m/s</span>
+                                            √(<span style="color: #FF3B30; font-weight: 600;">2</span> × <span style="color: #30D158; font-weight: 600;">9.8 m/s²</span> × <span style="color: #FF9F0A; font-weight: 600;">${h} m</span>) = <span style="color: #007AFF; font-weight: 600;">${v_impact.toFixed(3)} m/s</span>
                                         </div>
                                         <div style="font-size: 28px; color: #30D158; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
-                                            ${v_impact.toFixed(1)} m/s
+                                            ${v_impact.toFixed(3)} m/s
                                         </div>`
                                     }
                                 </div>
@@ -1321,11 +1321,11 @@
                                     </div>
 
                                     <div style="font-size: 17px; margin: 16px 0; color: #86868b; font-weight: 400;">
-                                        <span style="color: #FF3B30; font-weight: 600;">0.5</span> × <span style="color: #30D158; font-weight: 600;">${mass.toFixed(3)} kg</span> × (<span style="color: #007AFF; font-weight: 600;">${v_impact.toFixed(1)} m/s</span>)² = <span style="color: #FF9F0A; font-weight: 600;">${ke.toFixed(1)} J</span>
+                                        <span style="color: #FF3B30; font-weight: 600;">0.5</span> × <span style="color: #30D158; font-weight: 600;">${mass.toFixed(4)} kg</span> × (<span style="color: #007AFF; font-weight: 600;">${v_impact.toFixed(3)} m/s</span>)² = <span style="color: #FF9F0A; font-weight: 600;">${ke.toFixed(3)} J</span>
                                     </div>
 
                                     <div style="font-size: 28px; color: #FF9F0A; font-weight: 700; margin: 20px 0; letter-spacing: -0.5px;">
-                                        ${ke.toFixed(1)} J
+                                        ${ke.toFixed(3)} J
                                     </div>
 
                                     <div style="font-size: 13px; color: #86868b; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(134, 134, 139, 0.2); font-weight: 400;">
