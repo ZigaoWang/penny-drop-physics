@@ -129,6 +129,9 @@
             margin: 24px;
             width: 252px;
             height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         #dual-results {
@@ -439,6 +442,9 @@
                 margin: 8px;
                 padding: 16px;
                 grid-area: controls;
+                max-height: calc(100vh - 160px);
+                overflow-y: auto;
+                overflow-x: hidden;
             }
 
             #graphs {
@@ -479,6 +485,9 @@
                 margin: 8px;
                 padding: 16px;
                 max-width: none;
+                max-height: calc(100vh - 280px);
+                overflow-y: auto;
+                overflow-x: hidden;
             }
 
             #graphs {
@@ -529,6 +538,9 @@
             #controls, #graphs {
                 margin: 8px;
                 padding: 16px;
+                max-height: calc(100vh - 220px);
+                overflow-y: auto;
+                overflow-x: hidden;
             }
 
             .btn-group {
